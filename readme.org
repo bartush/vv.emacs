@@ -1,6 +1,6 @@
-#+title: Emacs stuff
+#+title: My Emacs stuff
 #+author: vvbrick
 ** My .emacs config file and usefull Emacs Lisp stuff
 
-1. [[file:vv.emacs][vv.emacs]] my emacs config
-2. [[file:vv.el][vv.el]] various emacs lisp helper functions
+- [[file:vv.emacs][vv.emacs]] my emacs config
+- [[file:vv.el][vv.el]] various emacs lisp helper functions
