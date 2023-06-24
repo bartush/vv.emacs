@@ -2,5 +2,5 @@
 #+author: vvbrick
 ** My .emacs config file and usefull Emacs Lisp stuff
 
-- [[file:vv.emacs][vv.emacs]] my emacs config
+- [[file:vv.emacs.windows10.el][vv.emacs.windows10.el]] my current emacs config on windows 10
 - [[file:vv.el][vv.el]] various emacs lisp helper functions
