@@ -34,7 +34,4 @@
 	  (princ "\nvalue: ")
 	  (princ thing)))
       (princ "\n=================================\n")
-      result
-      )
-    )
-  )
+      result)))
