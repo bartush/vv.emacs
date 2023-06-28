@@ -83,6 +83,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(default ((t (:family "basis33" :foundry "outline" :slant normal :weight normal :height 180 :width normal))))
+ '(Info-quoted ((t (:weight semi-bold :family "basis33"))))
  '(tooltip ((default nil) (nil nil))))
 
 (set-fontset-font "fontset-default" 'windows-1251 "basis33") ;; set font for russian characters
@@ -159,7 +160,6 @@
 (set-face-foreground 'rainbow-delimiters-depth-7-face "#ccc")  ; light gray
 (set-face-foreground 'rainbow-delimiters-depth-8-face "#999")  ; medium gray
 (set-face-foreground 'rainbow-delimiters-depth-9-face "#666")  ; dark gray
-
 ;; Auto complete stuff
 (ac-config-default) ;; default auto-complete config
 ;;(setq tab-always-indent 'complete) ;; autocompletion visible in minibuffer
