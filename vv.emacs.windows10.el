@@ -1,3 +1,5 @@
+(load "~/vv.emacs/vv.el") ;; load helpers
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -82,7 +84,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((t (:family "basis33" :foundry "outline" :slant normal :weight normal :height 180 :width normal))))
+ '(default ((t (:family "basis33" :foundry "outline" :antialias none :slant normal :weight normal :height 200 :width normal))))
  '(variable-pitch ((default nil) (nil nil)))
  '(fixed-pitch-serif ((t (:inherit default :foreground "light blue"))))
  '(tooltip ((default nil) (nil nil))))
