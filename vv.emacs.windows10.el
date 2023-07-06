@@ -1,4 +1,4 @@
-(load "~/vv.emacs/vv.el") ;; load helpers
+(load "vv.el") ;; load helpers
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.

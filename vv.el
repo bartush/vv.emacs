@@ -139,24 +139,26 @@
     (vv/display-formfeed-line-decoration ?─)))
 
 (defun vv/narrow-to-formfeed-region ()
-  "Narrows buffer to region between formfeed ^L chars"
+  "Toggle buffer narrowing to current region between formfeed ^L chars"
   (interactive)
-  (widen)
   (add-hook 'post-command-hook 'vv/formfeed-line-narrowed-status)
-  (let ((start)	(end))
-    (progn
-      (save-excursion
-	(unless (= (point) (point-max))
-	  (goto-char (1+ (point))))
-	(setq start (or (search-backward (char-to-string  ?\^L) nil t 1)
-			(point-min))))
-      (save-excursion
-	(unless (= (point) (point-max))
-	  (goto-char (1+ (point))))
-	(setq end (or (search-forward (char-to-string ?\^L) nil t 1)
-		      (point-max))))
-      ;; (unless (= start (point-max))
-      ;; 	(1+ start))
-      (unless (= end (point-max))
-	(1+ end))
-      (narrow-to-region start end))))
+  (if (not (buffer-narrowed-p))
+      (let ((start) (end))
+	(progn
+	  (widen)
+	  (save-excursion
+	    (unless (= (point) (point-max))
+	      (goto-char (1+ (point))))
+	    (setq start (or (search-backward (char-to-string  ?\^L) nil t 1)
+			    (point-min))))
+	  (save-excursion
+	    (unless (= (point) (point-max))
+	      (goto-char (1+ (point))))
+	    (setq end (or (search-forward (char-to-string ?\^L) nil t 1)
+			  (point-max))))
+	  ;; (unless (= start (point-max))
+	  ;; 	(1+ start))
+	  (unless (= end (point-max))
+	    (1+ end))
+	  (narrow-to-region start end)))
+    (widen)))
