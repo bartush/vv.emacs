@@ -60,7 +60,7 @@
     (vv/display-formfeed-line-decoration)
     (when (not buffer-display-table)
       (setq buffer-display-table (make-display-table)))
-    (unless (aref buffer-display-table ?\^L)
+    (unless (aref buffer-display-table ?\^L)q
       (setq vv/display-formfeed-as-line-flag nil))
     (if vv/display-formfeed-as-line-flag
 	(progn (aset buffer-display-table ?\^L nil)
@@ -68,4 +68,4 @@
       (progn (aset buffer-display-table ?\^L
 		   vv/display-formfeed-line-array)
 	     (setq vv/display-formfeed-as-line-flag t)))
-    (redraw-buffer)))
+    (redraw-frame)))
