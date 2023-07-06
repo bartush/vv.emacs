@@ -51,7 +51,10 @@
 
 (defun vv/display-formfeed-line-decoration ()
   "Formfeed ^L char line display decoration"
-  (aset vv/display-formfeed-line-array 0 (make-glyph-code ?✂ 'font-lock-comment-face)))
+  (aset vv/display-formfeed-line-array 0 (make-glyph-code ?✂ 'font-lock-comment-face))
+  (aset vv/display-formfeed-line-array
+	(1- (length vv/display-formfeed-line-array))
+	(make-glyph-code ?✂ 'font-lock-comment-face)))
 
 (defun vv/display-formfeed-toogle-as-line ()
   "Toggles dispaly of the formfeed ^L char as line."
@@ -60,8 +63,8 @@
     (vv/display-formfeed-line-decoration)
     (when (not buffer-display-table)
       (setq buffer-display-table (make-display-table)))
-    (unless (aref buffer-display-table ?\^L)q
-      (setq vv/display-formfeed-as-line-flag nil))
+    (unless (aref buffer-display-table ?\^L)
+	    (setq vv/display-formfeed-as-line-flag nil))
     (if vv/display-formfeed-as-line-flag
 	(progn (aset buffer-display-table ?\^L nil)
 	       (setq vv/display-formfeed-as-line-flag nil))
