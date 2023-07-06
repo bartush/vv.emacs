@@ -73,11 +73,13 @@
 (tool-bar-mode 0)
 (set-cursor-color "chocolate1")
 (blink-cursor-mode 0)
+(setq delete-by-moving-to-trash t)  ;; enable move to trash bin
+(put 'narrow-to-region 'disabled nil) ;; enable narrowing
 
 (setq
-  scroll-margin 0
-  scroll-conservatively 100000
-  scroll-preserve-screen-position 1) ;; Scrolling parameters
+ scroll-margin 0
+ scroll-conservatively 100000
+ scroll-preserve-screen-position 1) ;; Scrolling parameters
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
