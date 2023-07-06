@@ -76,6 +76,12 @@
 (setq delete-by-moving-to-trash t)  ;; enable move to trash bin
 (put 'narrow-to-region 'disabled nil) ;; enable narrowing
 
+(defun .emacs/display-formfeed-as-line-hook ()
+  "Adds hook for displaying formfeed ^L chars as line when opening .el files"
+  (when (string= (file-name-extension buffer-file-name) "el")
+    (vv/display-formfeed-set-as-line)))
+(add-hook 'find-file-hook '.emacs/display-formfeed-as-line-hook)
+
 (setq
  scroll-margin 0
  scroll-conservatively 100000

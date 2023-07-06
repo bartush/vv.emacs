@@ -1,6 +1,3 @@
-;;(require 'cl-lib)
-;;(require 'cl)
-
 
 (defun vv/what? (thing)
   "Prints type and object representation"
@@ -38,7 +35,7 @@
 
 
 (defun vv/find-file-with-coding-system (file coding-system)
-  "Find FILE with CODING-SYSTEM."
+  "Find (Open) FILE with CODING-SYSTEM."
   (interactive (list
                 (read-file-name "File Name:")
                 (read-coding-system "Coding System:")))
@@ -53,7 +50,7 @@
       (find-file file))))
 
 (defun vv/find-file-with-windows1251 (file)
-  "Find FILE with cp1251-dos coding system."
+  "Find (Open) FILE with cp1251-dos coding system."
   (interactive (list (read-file-name "File Name:")))
   (let (buf (coding-system-for-read 'cp1251-dos))
     (if (setq buf
@@ -93,22 +90,40 @@
   ;;[?☨]
   "Array of symbols for formfeed char display")
 
-(defun vv/display-formfeed-line-decoration ()
-  "Formfeed ^L char line display decoration"
-  (aset vv/display-formfeed-line-array 0 (make-glyph-code ?✂ 'font-lock-comment-face))
-  (aset vv/display-formfeed-line-array
-	(1- (length vv/display-formfeed-line-array))
-	(make-glyph-code ?✂ 'font-lock-comment-face)))
+(defun vv/display-formfeed-line-narrow-decoration ()
+  "Formfeed ^L char line display standart decoration"
+  (vv/display-formfeed-line-decoration ?✂))
+
+(defun vv/display-formfeed-line-decoration (char)
+  "Adds \\[char] at the beginnig and at the end of formfeed ^L char line display"
+  (let ((decor-char char))
+    (progn
+      (aset vv/display-formfeed-line-array 0 (make-glyph-code decor-char 'font-lock-comment-face))
+      (aset vv/display-formfeed-line-array
+	    (1- (length vv/display-formfeed-line-array))
+	    (make-glyph-code decor-char 'font-lock-comment-face)))))
+
+(defun vv/display-formfeed-set-as-line ()
+  "Set dispaly of the formfeed ^L char as line."
+  (interactive)
+  (progn
+    (vv/display-formfeed-line-decoration ?─)
+    (when (not buffer-display-table)
+      (setq buffer-display-table (make-display-table)))
+    (progn (aset buffer-display-table ?\^L
+		 vv/display-formfeed-line-array)
+	   (setq vv/display-formfeed-as-line-flag t))
+    (redraw-frame)))
 
 (defun vv/display-formfeed-toogle-as-line ()
   "Toggles dispaly of the formfeed ^L char as line."
   (interactive)
   (progn
-    (vv/display-formfeed-line-decoration)
+    (vv/display-formfeed-line-decoration ?─)
     (when (not buffer-display-table)
       (setq buffer-display-table (make-display-table)))
     (unless (aref buffer-display-table ?\^L)
-	    (setq vv/display-formfeed-as-line-flag nil))
+      (setq vv/display-formfeed-as-line-flag nil))
     (if vv/display-formfeed-as-line-flag
 	(progn (aset buffer-display-table ?\^L nil)
 	       (setq vv/display-formfeed-as-line-flag nil))
@@ -116,3 +131,32 @@
 		   vv/display-formfeed-line-array)
 	     (setq vv/display-formfeed-as-line-flag t)))
     (redraw-frame)))
+
+(defun vv/formfeed-line-narrowed-status ()
+  "Changes formfeed ^L char as line decoration when narrowing."
+  (if (buffer-narrowed-p)
+      (vv/display-formfeed-line-narrow-decoration)
+    (vv/display-formfeed-line-decoration ?─)))
+
+(defun vv/narrow-to-formfeed-region ()
+  "Narrows buffer to region between formfeed ^L chars"
+  (interactive)
+  (widen)
+  (add-hook 'post-command-hook 'vv/formfeed-line-narrowed-status)
+  (let ((start)	(end))
+    (progn
+      (save-excursion
+	(unless (= (point) (point-max))
+	  (goto-char (1+ (point))))
+	(setq start (or (search-backward (char-to-string  ?\^L) nil t 1)
+			(point-min))))
+      (save-excursion
+	(unless (= (point) (point-max))
+	  (goto-char (1+ (point))))
+	(setq end (or (search-forward (char-to-string ?\^L) nil t 1)
+		      (point-max))))
+      ;; (unless (= start (point-max))
+      ;; 	(1+ start))
+      (unless (= end (point-max))
+	(1+ end))
+      (narrow-to-region start end))))
