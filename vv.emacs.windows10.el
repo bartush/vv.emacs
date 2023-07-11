@@ -78,7 +78,7 @@
 
 ;; =============== Basic Customization ===============
 
-(menu-bar-mode 0)                   ;; Hide menu bar
+(menu-bar-mode 1)                   ;; Hide menu bar
 (setq inhibit-startup-message t)    ;; Hide the startup message
 (load-theme 'material t)            ;; Load material theme
 ;; (load-theme 'leuven t)
@@ -93,6 +93,12 @@
 (blink-cursor-mode 0)
 (setq delete-by-moving-to-trash t)  ;; enable move to trash bin
 (put 'narrow-to-region 'disabled nil) ;; enable narrowing
+
+;; setup for super key used in s-... shortcuts
+(setq w32-pass-lwindow-to-system nil)
+(setq w32-lwindow-modifier 'super) ; Left Windows key
+(setq w32-pass-rwindow-to-system nil)
+(setq w32-rwindow-modifier 'super) ; Right Windows key
 
 (defun .emacs/display-formfeed-as-line-hook ()
   "Adds hook for displaying formfeed ^L chars as line when opening .el files"
@@ -228,6 +234,7 @@
   (require 'dap-cpptools)
   (yas-global-mode))
 
+(setq lsp-keymap-prefix "s-n") ;; s-l used to locscreen in windows so rebind it to s-n
 
 ;; ====================== emacs lisp setup ===================
 
