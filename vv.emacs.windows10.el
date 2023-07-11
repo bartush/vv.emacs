@@ -78,7 +78,7 @@
 
 ;; =============== Basic Customization ===============
 
-(menu-bar-mode 1)                   ;; Hide menu bar
+(menu-bar-mode 0)                   ;; Hide menu bar
 (setq inhibit-startup-message t)    ;; Hide the startup message
 (load-theme 'material t)            ;; Load material theme
 ;; (load-theme 'leuven t)
@@ -124,6 +124,9 @@
  (list 'default (list (list t .emacs/default-face-properties-list))) ;; default face
  '(variable-pitch ((default nil) (nil nil)))
  '(fixed-pitch-serif ((t (:inherit default :foreground "light blue"))))
+ '(fixed-pitch ((t (:inherit default :foreground "light green"))))
+ '(help-for-help-header ((t (:height 1.02))))
+ '(helm-source-header ((t (:weight bold :height 1.05))))
  '(tooltip ((default nil) (nil nil))))
 
 (set-fontset-font "fontset-default" 'windows-1251 "basis33") ;; set font for russian characters
