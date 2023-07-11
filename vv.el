@@ -78,7 +78,7 @@
     (set-buffer-file-coding-system target-encoding)))
 
 
-(defvar vv/const/formfeed-as-line-length 50
+(defvar vv/const/formfeed-as-line-length 40
   "Length of formfeed ^L char line")
 
 (defvar vv/display-formfeed-line-array

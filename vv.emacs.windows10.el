@@ -1,5 +1,10 @@
 (load "vv.el") ;; load helpers
 
+
+;; .emacs variables
+(defvar .emacs/default-face-size 250)
+
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -21,6 +26,7 @@
 (require 'package)
 
 ;; Adds the Melpa archive to the list of available repositories
+
 (add-to-list 'package-archives
              '("melpa" . "http://melpa.org/packages/") t)
 
@@ -31,14 +37,17 @@
 (when (not package-archive-contents)
   (package-refresh-contents))
 
+;;(setq package-check-signatures nil) ;; disable signature checking
+
 ;; Installs packages
 ;; my packages list
 (defvar my-packages
-  '(better-defaults                 ;; Set up some better Emacs defaults
-    material-theme                  ;; Theme
-    use-package                     ;; Package configuration macros
-    py-autopep8                     ;; Run autopep8 on save
-    blacken                         ;; Black formatting on save
+  '(better-defaults ;; Set up some better Emacs defaults
+    material-theme  ;; Theme
+    use-package	    ;; Package configuration macros
+    py-autopep8	    ;; Run autopep8 on save
+    blacken	    ;; Black formatting on save
+    pc-bufsw
     flycheck
     elpy
     org-download
@@ -47,8 +56,18 @@
     markdown-mode
     paredit
     rainbow-delimiters
-    )
-  )
+    yasnippet
+    lsp-mode
+    lsp-treemacs
+    helm-lsp
+    projectile
+    hydra
+    company
+    avy
+    which-key
+    helm-xref
+    dap-mode
+    ))
 
 ;; Scans the list in my-packages
 ;; If the package listed is not already installed, install it
@@ -56,7 +75,6 @@
           (unless (package-installed-p package)
             (package-install package)))
       my-packages)
-
 
 ;; =============== Basic Customization ===============
 
@@ -82,17 +100,22 @@
     (vv/display-formfeed-set-as-line)))
 (add-hook 'find-file-hook '.emacs/display-formfeed-as-line-hook)
 
+(pc-bufsw t) ;; Enables PC style quick buffer switcher for Emacs
+
 (setq
  scroll-margin 0
  scroll-conservatively 100000
  scroll-preserve-screen-position 1) ;; Scrolling parameters
+
+(defvar .emacs/default-face-properties-list
+  (list :family "basis33" :foundry "outline" :antialias 'none :slant 'normal :weight 'normal :height .emacs/default-face-size :width 'normal))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((t (:family "basis33" :foundry "outline" :antialias none :slant normal :weight normal :height 200 :width normal))))
+ (list 'default (list (list t .emacs/default-face-properties-list))) ;; default face
  '(variable-pitch ((default nil) (nil nil)))
  '(fixed-pitch-serif ((t (:inherit default :foreground "light blue"))))
  '(tooltip ((default nil) (nil nil))))
@@ -114,10 +137,10 @@
 (global-set-key (kbd "C-y") 'undo-fu-only-redo)
 
 ;; Interactively do things.
-(ido-mode 1)
-(ido-everywhere)
-(setq ido-enable-flex-matching t)
-(fido-mode)
+;; (ido-mode 1)
+;; (ido-everywhere) ;; disabled, because incomatible with helm-mode
+;; (setq ido-enable-flex-matching t)
+;; (fido-mode)
 
 ;; Show stray whitespace.
 (setq-default show-trailing-whitespace t)
@@ -171,10 +194,39 @@
 (set-face-foreground 'rainbow-delimiters-depth-7-face "#ccc")  ; light gray
 (set-face-foreground 'rainbow-delimiters-depth-8-face "#999")  ; medium gray
 (set-face-foreground 'rainbow-delimiters-depth-9-face "#666")  ; dark gray
+
 ;; Auto complete stuff
 (ac-config-default) ;; default auto-complete config
-;;(setq tab-always-indent 'complete) ;; autocompletion visible in minibuffer
-;;(add-to-list 'completion-styles 'initials t)
+(setq tab-always-indent 'complete) ;; autocompletion visible in minibuffer
+(add-to-list 'completion-styles 'initials t)
+(add-hook 'c-mode-hook (lambda () (auto-complete-mode -1)))   ;; disable auto-complete
+(add-hook 'c++-mode-hook (lambda () (auto-complete-mode -1))) ;; in c/c++ modes
+(add-hook 'python-mode-hook (lambda () (auto-complete-mode -1))) ;; and pythpon mode too
+
+;; ======================  lsp mode and stuff ============================
+
+;; sample `helm' configuration use https://github.com/emacs-helm/helm/ for details
+(helm-mode)
+(require 'helm-xref)
+(define-key global-map [remap find-file] #'helm-find-files)
+(define-key global-map [remap execute-extended-command] #'helm-M-x)
+(define-key global-map [remap switch-to-buffer] #'helm-mini)
+
+(which-key-mode)
+(add-hook 'c-mode-hook 'lsp)
+(add-hook 'c++-mode-hook 'lsp)
+
+(setq gc-cons-threshold (* 100 1024 1024)
+      read-process-output-max (* 1024 1024)
+      treemacs-space-between-root-nodes nil
+      company-idle-delay 0.0
+      company-minimum-prefix-length 1
+      lsp-idle-delay 0.1)  ;; clangd is fast
+
+(with-eval-after-load 'lsp-mode
+  (add-hook 'lsp-mode-hook #'lsp-enable-which-key-integration)
+  (require 'dap-cpptools)
+  (yas-global-mode))
 
 
 ;; ====================== emacs lisp setup ===================
