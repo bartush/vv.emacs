@@ -79,6 +79,8 @@
 ;; =============== Basic Customization ===============
 
 (menu-bar-mode 0)                   ;; Hide menu bar
+(setq visible-bell t)               ;; enable visible bell
+(setq ring-bell-function 'ignore)   ;; disable ring sound
 (setq inhibit-startup-message t)    ;; Hide the startup message
 (load-theme 'material t)            ;; Load material theme
 ;; (load-theme 'leuven t)
@@ -145,7 +147,20 @@
 (global-set-key (kbd "C-z") 'undo-fu-only-undo)
 (global-set-key (kbd "C-y") 'undo-fu-only-redo)
 
-;; Interactively do things.
+
+;; ============== Coding system stuff =====================
+(prefer-coding-system 'cp1251-dos)  ;; default coding system
+;; (setq process-coding-system-alist
+;;       (cons '("bash" . (cp1251-dos . cp1251-dos))
+;; 	    process-coding-system-alist)) ;; coding system for eshell on windows
+(add-to-list 'file-coding-system-alist '("\\.org" . utf-8))
+(add-to-list 'file-coding-system-alist '("\\.py" . utf-8))
+(add-to-list 'file-coding-system-alist '("\\.cpp" . utf-8))
+(add-to-list 'file-coding-system-alist '("\\.hpp" . utf-8))
+(add-to-list 'file-coding-system-alist '("\\.c" . utf-8))
+(add-to-list 'file-coding-system-alist '("\\.h" . utf-8))
+
+;; IDO mode. Interactively do things.
 ;; (ido-mode 1)
 ;; (ido-everywhere) ;; disabled, because incomatible with helm-mode
 ;; (setq ido-enable-flex-matching t)
@@ -280,12 +295,10 @@
 (add-hook 'elpy-mode-hook 'py-autopep8-mode)
 
 
-
 ;; ======================== org-mode ===================
 
 (setq org-startup-with-inline-images t)  ;; display inline images at startup
 (setq org-support-shift-select 'always)  ;; enable selecting text with arrow keys using shift
-
 
 ;; org-download package
 (require 'org-download)
@@ -318,15 +331,6 @@
 
 ;; =====================================================
 
-
-;;(prefer-coding-system 'cp1251)
-;;(defadvice shell (after my-shell-advice)
-;;(set-default-coding-systems 'cp1251)
-;;(set-language-environment 'cp1251)
-;;(set-selection-coding-system 'cp1251)
-;;(set-process-coding-system 'cp1251 'cp1251))
-
-
 ;; Hide/Show
 (require 'hideshow)
 (add-to-list 'hs-special-modes-alist
@@ -344,48 +348,8 @@
 (setq-default c-basic-offset 4)
 (add-hook 'c-mode-common-hook   'hs-minor-mode)
 
-
-;; C/C++ autocomplete
-;;(require 'auto-complete-c-headers)
-;;(add-to-list 'ac-sources 'ac-source-c-headers)
-;;(require 'auto-complete)
-;;(require 'auto-complete-config)
-;;(ac-config-default)
-
-;; Start yasnippet
-;;(require 'yasnippet)
-;;(yas-global-mode 1)
-
-
 ;; set  F5 key to run compile!
 (global-set-key [f5] 'compile)
-
-
-;; dired
-(defun my-interactive ()
-  (interactive)
-  (message "\ninteractive hello"))
-
-
-;; C/C++ mode
-;;(load "~/.emacs.d/c++_mode.el")
-
-
-;; python
-;;(setq python-shell-interpreter "/usr/bin/python3")
-
-
-;;(define-key key-translation-map [pause] (kbd "\C-c"))
-;; (global-set-key [24 pause] (quote save-buffers-kill-terminal))
-
-
-;;(setq explicit-shell-file-name "c:/msys64/usr/bin/bash.exe")
-;;(setq shell-file-name "bash")
-;;(setq explicit-bash.exe-args '("--login" "-i"))
-;;(setq explicit-bash.exe-args '("--login"))
-;;(setenv "SHELL" shell-file-name)
-;;(add-hook 'comint-output-filter-functions 'comint-strip-ctrl-m)
-
 
 ;; ========================= Start server. ===============================
 (require 'server)
