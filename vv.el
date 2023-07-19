@@ -62,6 +62,19 @@
         (error "Buffer \"%s\" is still visiting \"%s\". In that case `find-file-with-coding-system' does not work as expected." buf file)
       (find-file file))))
 
+(defun vv/find-file-with-dos866 (file)
+  "Find (Open) FILE with cp1251-dos coding system."
+  (interactive (list (read-file-name "File Name:")))
+  (let (buf (coding-system-for-read 'cp866-dos))
+    (if (setq buf
+              (catch :exit
+                (while (setq buf (find-buffer-visiting file))
+                  (if (y-or-n-p (format "Kill buffer \"%s\" visiting file \"%s\"?" buf file))
+                      (kill-buffer buf)
+                    (throw :exit buf)))))
+        (error "Buffer \"%s\" is still visiting \"%s\". In that case `find-file-with-coding-system' does not work as expected." buf file)
+      (find-file file))))
+
 (defun vv/translate-buffer-encoding (target-encoding &optional source-encoding)
   "Translate buffer encoding from SOURCE-ENCODING to TARGET-ENCODING."
   (interactive (list (read-non-nil-coding-system "Target encoding:")))
