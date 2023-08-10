@@ -2,7 +2,7 @@
 
 
 ;; .emacs variables
-(defvar .emacs/default-face-size 250)
+(defconst .emacs/default-face-size 230)
 
 
 (custom-set-variables
@@ -44,6 +44,8 @@
 (defvar my-packages
   '(better-defaults ;; Set up some better Emacs defaults
     material-theme  ;; Theme
+    spacemacs-theme ;; Spacemacs theme
+    ayu-theme       ;; Ayu theme
     use-package	    ;; Package configuration macros
     py-autopep8	    ;; Run autopep8 on save
     blacken	    ;; Black formatting on save
@@ -67,6 +69,10 @@
     which-key
     helm-xref
     dap-mode
+    svg
+    cython-mode
+    flycheck-cython
+    basic-mode
     ))
 
 ;; Scans the list in my-packages
@@ -82,7 +88,9 @@
 (setq visible-bell t)               ;; enable visible bell
 (setq ring-bell-function 'ignore)   ;; disable ring sound
 (setq inhibit-startup-message t)    ;; Hide the startup message
-(load-theme 'material t)            ;; Load material theme
+(load-theme 'ayu-light t)
+;; (load-theme 'material t)         ;; Load material theme
+;; (load-theme 'spacemacs-light t)
 ;; (load-theme 'leuven t)
 ;; (global-linum-mode t)            ;; Enable line numbers globaly
 (add-hook 'prog-mode-hook #'display-line-numbers-mode) ;; enable line numbers only in code buffers
@@ -124,12 +132,26 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  (list 'default (list (list t .emacs/default-face-properties-list))) ;; default face
- '(variable-pitch ((default nil) (nil nil)))
+ '(fixed-pitch ((t (:inherit default :family "basis33" :foreground "light green"))))
  '(fixed-pitch-serif ((t (:inherit default :foreground "light blue"))))
- '(fixed-pitch ((t (:inherit default :foreground "light green"))))
+ ;;'(variable-pitch ((default nil) (nil nil)))
+ '(variable-pitch ((t (:family "basis33"))))
  '(help-for-help-header ((t (:height 1.02))))
  '(helm-source-header ((t (:weight bold :height 1.05))))
- '(tooltip ((default nil) (nil nil))))
+ '(helm-ff-dotted-directory ((t (:background "gainsboro"))))
+ '(tooltip ((default nil) (nil nil)))
+ '(shadow ((t (:foreground "light blue"))))
+ '(org-block ((t (:inherit shadow :foreground "gray50" :background "white smoke"))))
+ '(org-meta-line ((t (:background "gainsboro"))))
+ '(org-level-1 ((t (:inherit outline-1 :weight bold :height 1.4))))
+ '(org-level-2 ((t (:inherit outline-2 :weight bold :height 1.35))))
+ '(org-level-3 ((t (:inherit outline-3 :weight bold :height 1.3))))
+ '(org-level-4 ((t (:inherit outline-4 :weight bold :height 1.25))))
+ '(org-level-5 ((t (:inherit outline-5 :weight bold :height 1.2))))
+ '(org-level-6 ((t (:inherit outline-6 :weight bold :height 1.15))))
+ '(org-level-7 ((t (:inherit outline-7 :weight bold :height 1.1))))
+ '(org-level-8 ((t (:inherit outline-8 :weight bold :height 1.05)))))
+
 
 (set-fontset-font "fontset-default" 'windows-1251 "basis33") ;; set font for russian characters
 
@@ -138,15 +160,20 @@
   (list (list 'default (list :height size))))
 
 (with-current-buffer (get-buffer " *Echo Area 0*")
-  (setq-local face-remapping-alist (.emacs/get-font-prop-list 0.8))) 
+  (setq-local face-remapping-alist (.emacs/get-font-prop-list (/ 0.8 0.8))))
 
 (with-current-buffer (get-buffer "*Messages*")
-  (setq-local face-remapping-alist (.emacs/get-font-prop-list 0.6)))
+  (setq-local face-remapping-alist (.emacs/get-font-prop-list (/ 0.6 0.6))))
 
-;; undo / redo
+;; key bindings
 (global-set-key (kbd "C-z") 'undo-fu-only-undo)
 (global-set-key (kbd "C-y") 'undo-fu-only-redo)
 
+(global-set-key (kbd "C-x f") 'find-file) ;; reset "C-x f" to find file same as "C-x C-f"
+
+;; SVG support
+(auto-image-file-mode 1)
+(require 'svg)
 
 ;; ============== Coding system stuff =====================
 (prefer-coding-system 'cp1251-dos)  ;; default coding system
@@ -225,10 +252,10 @@
 (add-to-list 'completion-styles 'initials t)
 (add-hook 'c-mode-hook (lambda () (auto-complete-mode -1)))   ;; disable auto-complete
 (add-hook 'c++-mode-hook (lambda () (auto-complete-mode -1))) ;; in c/c++ modes
-(add-hook 'python-mode-hook (lambda () (auto-complete-mode -1))) ;; and pythpon mode too
+(add-hook 'python-mode-hook (lambda () (auto-complete-mode -1))) ;; and python mode too
+(add-hook 'cython-mode-hook (lambda () (auto-complete-mode -1))) ;; cython mode as well
 
 ;; ======================  lsp mode and stuff ============================
-
 ;; sample `helm' configuration use https://github.com/emacs-helm/helm/ for details
 (helm-mode)
 (require 'helm-xref)
@@ -264,6 +291,9 @@
 (define-key emacs-lisp-mode-map (kbd "C-c C-c") #'.emacs/elisp-mode-eval-buffer)
 (define-key lisp-interaction-mode-map (kbd "C-c C-c") #'.emacs/elisp-mode-eval-buffer)
 
+(add-hook 'emacs-lisp-mode-hook  (lambda ()
+				   (modify-syntax-entry ?- "w" emacs-lisp-mode-syntax-table)))
+
 ;; ================== python development setup ===================
 
 ;; Enable elpy
@@ -279,7 +309,7 @@
   (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
   (add-hook 'elpy-mode-hook 'flycheck-mode))
 
-;;(with-current-buffer (get-buffer " *Echo Area 0*")                                 ; the leading space character is correct
+;;(with-current-buffer (get-buffer " *Echo Area 0*")  ; the leading space character is correct
 ;;     (setq-local face-remapping-alist '((default (:height 0.9) variable-pitch)))) ; etc.
 
 ;; Goto function definition kbd hook
@@ -293,6 +323,16 @@
 ;; Enable autopep8
 (require 'py-autopep8)
 (add-hook 'elpy-mode-hook 'py-autopep8-mode)
+
+
+;; Cython-mode
+(require 'cython-mode)
+(when (require 'flycheck-cython nil t)
+  (add-hook 'cython-mode-hook 'flycheck-mode))
+
+;; Basic-mode setup
+(autoload 'basic-generic-mode "basic-mode" "Major mode for editing BASIC code." t)
+(add-to-list 'auto-mode-alist '("\\.bas\\'" . basic-generic-mode))
 
 
 ;; ======================== org-mode ===================
@@ -346,7 +386,9 @@
 ;; C/C++
 (setq c-default-style "gnu")
 (setq-default c-basic-offset 4)
-(add-hook 'c-mode-common-hook   'hs-minor-mode)
+(add-hook 'c-mode-common-hook 'hs-minor-mode)
+(add-hook 'c++-mode-hook (lambda ()
+			   (modify-syntax-entry ?_ "w" c++-mode-hook)))
 
 ;; set  F5 key to run compile!
 (global-set-key [f5] 'compile)
@@ -355,3 +397,8 @@
 (require 'server)
 (unless (server-running-p)
   (server-start))
+
+(message "Configuration vv.emacs.windows10.el loaded!")
+(if (daemonp)
+    (message "Loading in the daemon!")
+  (message "Loading in regular Emacs!"))

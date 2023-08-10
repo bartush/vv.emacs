@@ -3,3 +3,5 @@
 
 - [[file:vv.emacs.windows10.el][vv.emacs.windows10.el]] my current emacs config on windows 10
 - [[file:vv.el][vv.el]] helper functions
+
+  
