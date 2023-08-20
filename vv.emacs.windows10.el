@@ -75,6 +75,7 @@
     cython-mode
     flycheck-cython
     basic-mode
+    org-bullets
     ))
 
 ;; Scans the list in my-packages
@@ -145,14 +146,14 @@
  '(shadow ((t (:foreground "light blue"))))
  '(org-block ((t (:inherit shadow :foreground "gray50" :background "white smoke"))))
  '(org-meta-line ((t (:background "gainsboro"))))
- '(org-level-1 ((t (:inherit outline-1 :weight bold :height 1.4))))
- '(org-level-2 ((t (:inherit outline-2 :weight bold :height 1.35))))
- '(org-level-3 ((t (:inherit outline-3 :weight bold :height 1.3))))
- '(org-level-4 ((t (:inherit outline-4 :weight bold :height 1.25))))
- '(org-level-5 ((t (:inherit outline-5 :weight bold :height 1.2))))
- '(org-level-6 ((t (:inherit outline-6 :weight bold :height 1.15))))
- '(org-level-7 ((t (:inherit outline-7 :weight bold :height 1.1))))
- '(org-level-8 ((t (:inherit outline-8 :weight bold :height 1.05)))))
+ '(org-level-1 ((t (:inherit outline-1 :weight bold :height 1.1))))
+ '(org-level-2 ((t (:inherit outline-2 :weight bold :height 1.1))))
+ '(org-level-3 ((t (:inherit outline-3 :weight bold :height 1.1))))
+ '(org-level-4 ((t (:inherit outline-4 :weight bold :height 1.05))))
+ '(org-level-5 ((t (:inherit outline-5 :weight bold :height 1.05))))
+ '(org-level-6 ((t (:inherit outline-6 :weight bold :height 1.05))))
+ '(org-level-7 ((t (:inherit outline-7 :weight bold :height 1.0))))
+ '(org-level-8 ((t (:inherit outline-8 :weight bold :height 1.0)))))
 
 
 (set-fontset-font "fontset-default" 'windows-1251 "basis33") ;; set font for russian characters
@@ -370,6 +371,22 @@
         (("C-M-y" . org-download-screenshot)
          ("s-y" . org-download-yank))))
 ;;(setq org-download-screenshot-method #'my-save-image-from-clipboard)
+
+(require 'org-bullets)
+(add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+;;(setq org-bullets-bullet-list '("◉" "▸" "▹" "◦" "▪" "▫" "•"))
+(setq org-bullets-bullet-list '("◉" "￮" "⊚" "⊛" "⊕" "⊙"))
+
+;; set tags faces
+(add-to-list 'org-tag-faces '("urgent" . (:foreground "red")))
+(add-hook 'org-mode-hook
+          (lambda ()
+            ;; (push '("[ ]" .  "🞎") prettify-symbols-alist)
+            ;; (push '("[X]" . "🗷" ) prettify-symbols-alist)
+            ;; (push '("[-]" . "◫" ) prettify-symbols-alist)
+	    (push '("urgent" . "☭" ) prettify-symbols-alist)  ;; replace tag with glyph symbol
+            (prettify-symbols-mode)))
+
 
 ;; =====================================================
 
