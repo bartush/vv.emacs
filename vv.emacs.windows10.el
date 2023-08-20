@@ -2,7 +2,9 @@
 
 
 ;; .emacs variables
-(defconst .emacs/default-face-size 230)
+
+(defconst .emacs/default-face-size (cond  ((equal "COREI3" (system-name)) 190)
+					  (t 230)))
 
 
 (custom-set-variables
