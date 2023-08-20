@@ -375,6 +375,17 @@
 ;;(setq org-bullets-bullet-list '("◉" "▸" "▹" "◦" "▪" "▫" "•"))
 (setq org-bullets-bullet-list '("◉" "￮" "⊚" "⊛" "⊕" "⊙"))
 
+;; set tags faces
+(add-to-list 'org-tag-faces '("urgent" . (:foreground "red")))
+(add-hook 'org-mode-hook
+          (lambda ()
+            ;; (push '("[ ]" .  "🞎") prettify-symbols-alist)
+            ;; (push '("[X]" . "🗷" ) prettify-symbols-alist)
+            ;; (push '("[-]" . "◫" ) prettify-symbols-alist)
+	    (push '("urgent" . "☭" ) prettify-symbols-alist)  ;; replace tag with glyph symbol
+            (prettify-symbols-mode)))
+
+
 ;; =====================================================
 
 ;; Hide/Show
