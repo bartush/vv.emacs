@@ -201,6 +201,15 @@
 (setq-default indicate-empty-lines t)
 (setq-default indicate-buffer-boundaries 'left)
 
+(defun .emacs/hide-trailing-whitespace ()
+  "Disable `show-trailing-whitespace' in shell modes."
+  (when (or (derived-mode-p 'shell-mode)
+	    (equal major-mode 'eshell-mode))
+    (setq show-trailing-whitespace nil
+	  indicate-empty-lines nil)))
+
+(add-hook 'after-change-major-mode-hook '.emacs/hide-trailing-whitespace)
+
 ;; Highlight matching pairs of parentheses.
 (setq show-paren-delay 0)
 (show-paren-mode)
