@@ -204,7 +204,8 @@
 (defun .emacs/hide-trailing-whitespace ()
   "Disable `show-trailing-whitespace' in shell modes."
   (when (or (derived-mode-p 'shell-mode)
-	    (equal major-mode 'eshell-mode))
+	    (equal major-mode 'eshell-mode)
+	    (equal major-mode 'inferior-python-mode))
     (setq show-trailing-whitespace nil
 	  indicate-empty-lines nil)))
 
@@ -323,6 +324,19 @@
 
 ;;(with-current-buffer (get-buffer " *Echo Area 0*")  ; the leading space character is correct
 ;;     (setq-local face-remapping-alist '((default (:height 0.9) variable-pitch)))) ; etc.
+
+(use-package pyvenv
+  :ensure t
+  :config
+  (pyvenv-mode t)
+
+  ;; Set correct Python interpreter
+  (setq pyvenv-post-activate-hooks
+        (list (lambda ()
+                (setq python-shell-interpreter (concat pyvenv-virtual-env "Scripts/python.exe")))))
+  (setq pyvenv-post-deactivate-hooks
+        (list (lambda ()
+                (setq python-shell-interpreter "python")))))
 
 ;; Goto function definition kbd hook
 (defun goto-def-or-rgrep ()
