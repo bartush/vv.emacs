@@ -4,6 +4,7 @@
 ;; .emacs variables
 
 (defconst .emacs/default-face-size (cond  ((equal "COREI3" (system-name)) 190)
+					  ((equal "THINKPAD" (system-name)) 190)
 					  (t 230)))
 
 
@@ -426,8 +427,9 @@
 (global-set-key (kbd "C-c h") 'hs-toggle-hiding)
 
 ;; C/C++
-(setq c-default-style "gnu")
+(setq c-default-style "linux")
 (setq-default c-basic-offset 4)
+
 (add-hook 'c-mode-common-hook 'hs-minor-mode)
 (add-hook 'c++-mode-hook (lambda ()
 			   (modify-syntax-entry ?_ "w" c++-mode-hook)))
