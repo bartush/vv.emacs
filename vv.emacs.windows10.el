@@ -77,6 +77,8 @@
     flycheck-cython
     basic-mode
     org-bullets
+    cmake-mode
+    cmake-project
     ))
 
 ;; Scans the list in my-packages
@@ -105,8 +107,16 @@
 (tool-bar-mode 0)
 (set-cursor-color "chocolate1")
 (blink-cursor-mode 0)
+(set-face-attribute 'region nil :background "#666" :foreground "#ffffff")  ;; tweek selection (region) attributes
 (setq delete-by-moving-to-trash t)  ;; enable move to trash bin
 (put 'narrow-to-region 'disabled nil) ;; enable narrowing
+
+;; disable second selection shortcuts
+(global-unset-key [M-mouse-1])
+(global-unset-key [M-drag-mouse-1])
+(global-unset-key [M-down-mouse-1])
+(global-unset-key [M-mouse-3])
+(global-unset-key [M-mouse-2])
 
 ;; setup for super key used in s-... shortcuts
 (setq w32-pass-lwindow-to-system nil)
@@ -295,6 +305,20 @@
 
 (setq lsp-keymap-prefix "s-n") ;; s-l used to locscreen in windows so rebind it to s-n
 
+;; ====================== cmake stuff ========================
+
+(defun maybe-cmake-project-mode ()
+  (if (or (file-exists-p "CMakeLists.txt")
+          (file-exists-p (expand-file-name "CMakeLists.txt" (car (project-roots (project-current))))))
+      (cmake-project-mode)))
+
+(add-hook 'c-mode-hook 'maybe-cmake-project-mode)
+(add-hook 'c++-mode-hook 'maybe-cmake-project-mode)
+
+(add-hook 'find-file-hook (lambda ()
+			    (when (string= (buffer-file-name) "CMakeLists.txt")
+			      (cmake-mode))))
+
 ;; ====================== emacs lisp setup ===================
 
 (defun .emacs/elisp-mode-eval-buffer ()
@@ -431,8 +455,9 @@
 (setq-default c-basic-offset 4)
 
 (add-hook 'c-mode-common-hook 'hs-minor-mode)
-(add-hook 'c++-mode-hook (lambda ()
-			   (modify-syntax-entry ?_ "w" c++-mode-hook)))
+
+;; (add-hook 'c++-mode-hook (lambda ()
+;; 			   (modify-syntax-entry ?_ "w" c++-mode-hook)))
 
 ;; set  F5 key to run compile!
 (global-set-key [f5] 'compile)
