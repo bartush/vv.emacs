@@ -171,3 +171,50 @@
 	    (1+ end))
 	  (narrow-to-region start end)))
     (widen)))
+
+
+(defun vv/get-leading-zeroes-index-string (num-digits index)
+  "Function converts 'index' to string with leading
+   zeroes fitting given number of 'num-digits'"
+  (let* (str-index len-str-index)
+    (setq str-index (number-to-string index))
+    (setq len-str-index (length str-index))
+    (cond ((< num-digits len-str-index) nil)
+	  ((= num-digits len-str-index) str-index)
+	  (t (concat (make-string (- num-digits len-str-index) ?0) str-index)))))
+
+(defun vv/generate-available-file-name (path prefix num-digits extension)
+  "Function generates available file name at given 'path'
+   starting with 'prefix', 'num-digits' index and given 'extension'"
+  (let* (file-name file-name-formater index)
+    (setq index 0)
+    (setq file-name-formater (lambda ()
+			       (format "%s/%s%s%s"
+				       path
+				       prefix
+				       (vv/get-leading-zeroes-index-string num-digits index)
+				       extension)))
+    (setq file-name (funcall file-name-formater))
+    (while (file-exists-p file-name)
+      (setq index (1+ index))
+      (setq file-name (funcall file-name-formater)))
+    file-name))
+
+(defun vv/ipynb-export-image-at-point ()
+  "Command to export Emacs IPython Notebook (EIN) generated image at selected point to '.png' file"
+  (interactive)
+  (let ((property-list (text-properties-at (point))))
+    ;; (print (length property-list))
+    (let (display-props)
+      (setq display-props (plist-get property-list 'display))
+      (let (image-plist image-data)
+	(setq image-plist (when (eq 'image (car display-props))
+			    (cdr display-props)))
+	(when image-plist
+	  (setq image-data (plist-get image-plist :data))
+	  (with-current-buffer (get-buffer-create "*tmp*")
+	    (insert image-data)
+	    (let (file-name)
+	      (setq file-name (vv/generate-available-file-name .emacs/image-export-path "img" 6 ".png"))
+	      (write-file file-name))
+	    (kill-buffer (current-buffer))))))))

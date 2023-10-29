@@ -7,6 +7,8 @@
 					  ((equal "THINKPAD" (system-name)) 190)
 					  (t 230)))
 
+(defconst .emacs/image-export-path "~/../../../photo-export-emacs")
+
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -32,6 +34,10 @@
 
 (add-to-list 'package-archives
              '("melpa" . "http://melpa.org/packages/") t)
+(add-to-list 'package-archives
+             '("melpa-stable" . "http://stable.melpa.org/packages/") t)
+(add-to-list 'package-archives
+             '("gnu" . "http://elpa.gnu.org/packages/") t)
 
 ;; Initializes the package infrastructure
 (package-initialize)
@@ -79,6 +85,9 @@
     org-bullets
     cmake-mode
     cmake-project
+    python
+    jupyter
+    ein
     ))
 
 ;; Scans the list in my-packages
@@ -182,8 +191,10 @@
 ;; key bindings
 (global-set-key (kbd "C-z") 'undo-fu-only-undo)
 (global-set-key (kbd "C-y") 'undo-fu-only-redo)
-
 (global-set-key (kbd "C-x f") 'find-file) ;; reset "C-x f" to find file same as "C-x C-f"
+
+;; vv key bidings
+(global-set-key (kbd "C-c v e") 'vv/ipynb-export-image-at-point) ;; export image from notebook at point
 
 ;; SVG support
 (auto-image-file-mode 1)
@@ -342,6 +353,9 @@
 ;;  :config (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
 ;;		)
 
+;; ein custoize group properties
+(setq ein:output-area-inlined-images t)
+
 ;; Enable Flycheck
 (when (require 'flycheck nil t)
   (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
@@ -350,18 +364,45 @@
 ;;(with-current-buffer (get-buffer " *Echo Area 0*")  ; the leading space character is correct
 ;;     (setq-local face-remapping-alist '((default (:height 0.9) variable-pitch)))) ; etc.
 
+(setq python-shell-interpreter "python"
+      python-shell-interpreter-args "-i")
+
+(add-to-list 'python-shell-completion-native-disabled-interpreters
+             "jupyter")
+
+(defun .emacs/set-python-shell-interpreter-to-jupyter()
+  (setq python-shell-interpreter "Scripts/jupyter.exe"
+	python-shell-interpreter-args "console --simple-prompt"
+	python-shell-prompt-detect-failure-warning-warning nil))
+
+(defun .emacs/set-python-shell-interpreter-to-ipython()
+  (setq python-shell-interpreter (concat pyvenv-virtual-env "Scripts/ipython.exe")
+	python-shell-interpreter-args "-i --simple-prompt"))
+
+(defun .emacs/set-python-shell-interpreter-to-python()
+  (setq python-shell-interpreter "python"
+	python-shell-interpreter-args "-i"))
+
+
 (use-package pyvenv
   :ensure t
   :config
   (pyvenv-mode t)
 
+  ;; company auto completion backaend
+  ;; (add-hook 'elpy-mode-hook
+  ;; 	    (lambda ()
+  ;; 	      (set (make-local-variable 'company-backends)
+  ;; 		   '((company-dabbrev-code company-yasnippet elpy-company-backend)))))
+
   ;; Set correct Python interpreter
   (setq pyvenv-post-activate-hooks
-        (list (lambda ()
-                (setq python-shell-interpreter (concat pyvenv-virtual-env "Scripts/python.exe")))))
+	(cond ((equal pyvenv-virtual-env-name "transformers")
+               (list '.emacs/set-python-shell-interpreter-to-jupyter))
+	      (t (list '.emacs/set-python-shell-interpreter-to-python))))
+
   (setq pyvenv-post-deactivate-hooks
-        (list (lambda ()
-                (setq python-shell-interpreter "python")))))
+        (list '.emacs/set-python-shell-interpreter-to-python)))
 
 ;; Goto function definition kbd hook
 (defun goto-def-or-rgrep ()
