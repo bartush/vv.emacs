@@ -1,4 +1,10 @@
 
+;; macros
+(defmacro until (test &rest body)
+  `(while (not ,test)
+    ,@body))
+
+
 (defun vv/what? (thing)
   "Prints type and object representation"
   (let ((typeof) (result))
@@ -212,9 +218,8 @@
 			    (cdr display-props)))
 	(when image-plist
 	  (setq image-data (plist-get image-plist :data))
-	  (with-current-buffer (get-buffer-create "*tmp*")
+	  (with-temp-buffer
 	    (insert image-data)
 	    (let (file-name)
 	      (setq file-name (vv/generate-available-file-name .emacs/image-export-path "img" 6 ".png"))
-	      (write-file file-name))
-	    (kill-buffer (current-buffer))))))))
+	      (write-file file-name))))))))

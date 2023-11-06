@@ -1,4 +1,5 @@
 (load "vv.el") ;; load helpers
+(load "purge-folder.el") ;; purge-folder command
 
 
 ;; .emacs variables
@@ -164,6 +165,8 @@
  '(helm-ff-dotted-directory ((t (:background "gainsboro"))))
  '(tooltip ((default nil) (nil nil)))
  '(shadow ((t (:foreground "light blue"))))
+ '(line-number ((t (:inherit default :foreground "#e3e4e5"))))
+ '(line-number-current-line ((t (:inherit default :foreground "#ff772d"))))
  '(org-block ((t (:inherit shadow :foreground "gray50" :background "white smoke"))))
  '(org-meta-line ((t (:background "gainsboro"))))
  '(org-level-1 ((t (:inherit outline-1 :weight bold :height 1.1))))
@@ -496,6 +499,7 @@
 (setq-default c-basic-offset 4)
 
 (add-hook 'c-mode-common-hook 'hs-minor-mode)
+(add-hook 'emacs-lisp-mode-hook 'hs-minor-mode)
 
 ;; (add-hook 'c++-mode-hook (lambda ()
 ;; 			   (modify-syntax-entry ?_ "w" c++-mode-hook)))
