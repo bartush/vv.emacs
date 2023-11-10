@@ -203,6 +203,9 @@
 (auto-image-file-mode 1)
 (require 'svg)
 
+;; benchmarking
+(require 'benchmark)
+
 ;; ============== Coding system stuff =====================
 (prefer-coding-system 'cp1251-dos)  ;; default coding system
 ;; (setq process-coding-system-alist
