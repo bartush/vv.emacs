@@ -1,8 +1,27 @@
 
 ;; macros
-(defmacro until (test &rest body)
+(defmacro vv/until (test &rest body)
   `(while (not ,test)
     ,@body))
+
+(defmacro vv/when-version< (ver &rest body)
+  (declare (indent 1) (debug t))
+  (list 'if (version< emacs-version ver) (cons 'progn body)))
+
+(defmacro vv/measure-time (&rest body)
+  "Measure the time it takes to evaluate BODY."
+  `(let ((time (current-time)))
+     ,@body
+     (message "%.06f" (float-time (time-since time)))))
+
+(defmacro vv/measure-time-limit (limit &rest body)
+  "Measure the time it takes to evaluate BODY and
+   prints result if it more than `limit'"
+  `(let ((time (current-time)))
+     ,@body
+     (let ((time-est (float-time (time-since time))))
+       (unless (< time-est ,limit)
+	 (message "%.06f" time-est)))))
 
 
 (defun vv/what? (thing)

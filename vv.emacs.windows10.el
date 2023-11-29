@@ -1,5 +1,7 @@
 (load "vv.el") ;; load helpers
-(load "purge-folder.el") ;; purge-folder command
+
+;; set warning level
+(setq warning-minimum-level :error)
 
 
 ;; .emacs variables
@@ -19,8 +21,8 @@
  '(ansi-color-names-vector
    ["#2d3743" "#ff4242" "#74af68" "#dbdb95" "#34cae2" "#008b8b" "#00ede1" "#e1e1e0"])
  '(column-number-mode t)
- '(cua-mode t nil (cua-base))
- '(package-selected-packages '(material-theme better-defaults)))
+ '(image-scaling-factor 0.5) ;; 0.7143
+ '(cua-mode t nil (cua-base)))
 
 ;; Remove junk symbols in shell mode
 (setenv "PS1" "\\[\\e[32m\\]\\u@\\h \\[\\e[33m\\]\\w\\[\\e[0m\\]\\n\\$")
@@ -33,8 +35,8 @@
 
 ;; Adds the Melpa archive to the list of available repositories
 
-(add-to-list 'package-archives
-             '("melpa" . "http://melpa.org/packages/") t)
+;; (add-to-list 'package-archives
+;;              '("melpa" . "http://melpa.org/packages/") t)
 (add-to-list 'package-archives
              '("melpa-stable" . "http://stable.melpa.org/packages/") t)
 (add-to-list 'package-archives
@@ -52,44 +54,52 @@
 ;; Installs packages
 ;; my packages list
 (defvar my-packages
-  '(better-defaults ;; Set up some better Emacs defaults
-    material-theme  ;; Theme
-    spacemacs-theme ;; Spacemacs theme
+  '(
     ayu-theme       ;; Ayu theme
     use-package	    ;; Package configuration macros
-    py-autopep8	    ;; Run autopep8 on save
-    blacken	    ;; Black formatting on save
-    pc-bufsw
-    flycheck
-    elpy
-    org-download
     auto-complete
-    undo-fu
-    markdown-mode
     paredit
     rainbow-delimiters
-    yasnippet
-    lsp-mode
-    lsp-treemacs
-    helm-lsp
-    projectile
-    hydra
-    company
-    avy
     which-key
-    helm-xref
-    dap-mode
     svg
-    cython-mode
-    flycheck-cython
     basic-mode
+    org-download
     org-bullets
-    cmake-mode
-    cmake-project
-    python
-    jupyter
-    ein
+    tree-sitter
+    tree-sitter-langs
     ))
+
+;; packages not tested on 29 version, but working on 28
+(vv/when-version< "29.1"
+  (let ((my-packages28 '(
+			 better-defaults ;; Set up some better Emacs defaults
+			 py-autopep8	 ;; Run autopep8 on save
+			 blacken	 ;; Black formatting on save
+			 pc-bufsw
+			 flycheck
+			 elpy
+			 undo-fu
+			 markdown-mode
+			 yasnippet
+			 lsp-mode
+			 lsp-treemacs
+			 helm-lsp
+			 projectile
+			 hydra
+			 company
+			 avy
+			 helm-xref
+			 dap-mode
+			 cython-mode
+			 flycheck-cython
+			 cmake-mode
+			 cmake-project
+			 python
+			 jupyter
+			 ein
+			 )))
+
+    (setq my-packages (append my-packages my-packages28))))
 
 ;; Scans the list in my-packages
 ;; If the package listed is not already installed, install it
@@ -140,7 +150,7 @@
     (vv/display-formfeed-set-as-line)))
 (add-hook 'find-file-hook '.emacs/display-formfeed-as-line-hook)
 
-(pc-bufsw t) ;; Enables PC style quick buffer switcher for Emacs
+;;(pc-bufsw t) ;; Enables PC style quick buffer switcher for Emacs
 
 (setq
  scroll-margin 0
@@ -167,14 +177,15 @@
  '(shadow ((t (:foreground "light blue"))))
  '(line-number ((t (:inherit default :foreground "#e3e4e5"))))
  '(line-number-current-line ((t (:inherit default :foreground "#ff772d"))))
+ '(outline-2 ((t (:inherit font-lock-variable-name-face :foreground "salmon"))))
  '(org-block ((t (:inherit shadow :foreground "gray50" :background "white smoke"))))
  '(org-meta-line ((t (:background "gainsboro"))))
- '(org-level-1 ((t (:inherit outline-1 :weight bold :height 1.1))))
- '(org-level-2 ((t (:inherit outline-2 :weight bold :height 1.1))))
- '(org-level-3 ((t (:inherit outline-3 :weight bold :height 1.1))))
- '(org-level-4 ((t (:inherit outline-4 :weight bold :height 1.05))))
- '(org-level-5 ((t (:inherit outline-5 :weight bold :height 1.05))))
- '(org-level-6 ((t (:inherit outline-6 :weight bold :height 1.05))))
+ '(org-level-1 ((t (:inherit outline-1 :weight bold :height 1.0))))
+ '(org-level-2 ((t (:inherit outline-2 :weight bold :height 1.0))))
+ '(org-level-3 ((t (:inherit outline-3 :weight bold :height 1.0))))
+ '(org-level-4 ((t (:inherit outline-4 :weight bold :height 1.0))))
+ '(org-level-5 ((t (:inherit outline-5 :weight bold :height 1.0))))
+ '(org-level-6 ((t (:inherit outline-6 :weight bold :height 1.0))))
  '(org-level-7 ((t (:inherit outline-7 :weight bold :height 1.0))))
  '(org-level-8 ((t (:inherit outline-8 :weight bold :height 1.0)))))
 
@@ -219,25 +230,26 @@
 (add-to-list 'file-coding-system-alist '("\\.h" . utf-8))
 
 ;; IDO mode. Interactively do things.
-;; (ido-mode 1)
-;; (ido-everywhere) ;; disabled, because incomatible with helm-mode
-;; (setq ido-enable-flex-matching t)
-;; (fido-mode)
+(ido-mode 1)
+(ido-everywhere) ;; disabled, because incomatible with helm-mode
+(setq ido-enable-flex-matching t)
+(fido-mode)
 
 ;; Show stray whitespace.
-(setq-default show-trailing-whitespace t)
-(setq-default indicate-empty-lines t)
+(setq-default show-trailing-whitespace nil)
+(setq-default indicate-empty-lines nil)
 (setq-default indicate-buffer-boundaries 'left)
 
-(defun .emacs/hide-trailing-whitespace ()
-  "Disable `show-trailing-whitespace' in shell modes."
-  (when (or (derived-mode-p 'shell-mode)
-	    (equal major-mode 'eshell-mode)
-	    (equal major-mode 'inferior-python-mode))
-    (setq show-trailing-whitespace nil
-	  indicate-empty-lines nil)))
+(defun .emacs/show-trailing-whitespace ()
+  "Enable `show-trailing-whitespace' in shell modes."
+  (when (memq major-mode '(python-mode
+			   emacs-lisp-mode
+			   c++-mode
+			   c-mode))
+    (setq show-trailing-whitespace t
+	  indicate-empty-lines t)))
 
-(add-hook 'after-change-major-mode-hook '.emacs/hide-trailing-whitespace)
+(add-hook 'after-change-major-mode-hook '.emacs/show-trailing-whitespace)
 
 ;; Highlight matching pairs of parentheses.
 (setq show-paren-delay 0)
@@ -261,6 +273,12 @@
 ;; Write customizations to a separate file instead of this file.
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
 (load custom-file t)
+
+;; Make dired open in the same window when using RET or ^
+(require 'dired)
+(put 'dired-find-alternate-file 'disabled nil) ; disables warning
+(define-key dired-mode-map (kbd "RET") 'dired-find-alternate-file) ; was dired-advertised-find-file
+(define-key dired-mode-map (kbd "^") (lambda () (interactive) (find-alternate-file "..")))  ; was dired-up-directory
 
 ;; Enable Paredit.
 (add-hook 'emacs-lisp-mode-hook 'enable-paredit-mode)
@@ -296,45 +314,8 @@
 (add-hook 'python-mode-hook (lambda () (auto-complete-mode -1))) ;; and python mode too
 (add-hook 'cython-mode-hook (lambda () (auto-complete-mode -1))) ;; cython mode as well
 
-;; ======================  lsp mode and stuff ============================
-;; sample `helm' configuration use https://github.com/emacs-helm/helm/ for details
-(helm-mode)
-(require 'helm-xref)
-(define-key global-map [remap find-file] #'helm-find-files)
-(define-key global-map [remap execute-extended-command] #'helm-M-x)
-(define-key global-map [remap switch-to-buffer] #'helm-mini)
-
+;; Which key mode - display available keybindings in popup
 (which-key-mode)
-(add-hook 'c-mode-hook 'lsp)
-(add-hook 'c++-mode-hook 'lsp)
-
-(setq gc-cons-threshold (* 100 1024 1024)
-      read-process-output-max (* 1024 1024)
-      treemacs-space-between-root-nodes nil
-      company-idle-delay 0.0
-      company-minimum-prefix-length 1
-      lsp-idle-delay 0.1)  ;; clangd is fast
-
-(with-eval-after-load 'lsp-mode
-  (add-hook 'lsp-mode-hook #'lsp-enable-which-key-integration)
-  (require 'dap-cpptools)
-  (yas-global-mode))
-
-(setq lsp-keymap-prefix "s-n") ;; s-l used to locscreen in windows so rebind it to s-n
-
-;; ====================== cmake stuff ========================
-
-(defun maybe-cmake-project-mode ()
-  (if (or (file-exists-p "CMakeLists.txt")
-          (file-exists-p (expand-file-name "CMakeLists.txt" (car (project-roots (project-current))))))
-      (cmake-project-mode)))
-
-(add-hook 'c-mode-hook 'maybe-cmake-project-mode)
-(add-hook 'c++-mode-hook 'maybe-cmake-project-mode)
-
-(add-hook 'find-file-hook (lambda ()
-			    (when (string= (buffer-file-name) "CMakeLists.txt")
-			      (cmake-mode))))
 
 ;; ====================== emacs lisp setup ===================
 
@@ -349,89 +330,24 @@
 (add-hook 'emacs-lisp-mode-hook  (lambda ()
 				   (modify-syntax-entry ?- "w" emacs-lisp-mode-syntax-table)))
 
-;; ================== python development setup ===================
+;; ====================== C/C++ ==============================
 
-;; Enable elpy
-(elpy-enable)
-;;(use-package elpy
-;;  :init (advice-add 'python-mode :before 'elpy-enable)
-;;  :hook (elpy-mode . (lambda () (add-hook 'before-save-hook 'elpy-format-code)))
-;;  :config (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
-;;		)
+(setq c-default-style "linux")
+(setq-default c-basic-offset 4)
 
-;; ein custoize group properties
-(setq ein:output-area-inlined-images t)
+(add-hook 'c-mode-common-hook 'hs-minor-mode)
+(add-hook 'emacs-lisp-mode-hook 'hs-minor-mode)
 
-;; Enable Flycheck
-(when (require 'flycheck nil t)
-  (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
-  (add-hook 'elpy-mode-hook 'flycheck-mode))
+;; (add-hook 'c++-mode-hook (lambda ()
+;; 			   (modify-syntax-entry ?_ "w" c++-mode-hook)))
 
-;;(with-current-buffer (get-buffer " *Echo Area 0*")  ; the leading space character is correct
-;;     (setq-local face-remapping-alist '((default (:height 0.9) variable-pitch)))) ; etc.
+;; set  F5 key to run compile!
+(global-set-key [f5] 'compile)
 
-(setq python-shell-interpreter "python"
-      python-shell-interpreter-args "-i")
+;; ======================== Basic-mode setup ===========
 
-(add-to-list 'python-shell-completion-native-disabled-interpreters
-             "jupyter")
-
-(defun .emacs/set-python-shell-interpreter-to-jupyter()
-  (setq python-shell-interpreter "Scripts/jupyter.exe"
-	python-shell-interpreter-args "console --simple-prompt"
-	python-shell-prompt-detect-failure-warning-warning nil))
-
-(defun .emacs/set-python-shell-interpreter-to-ipython()
-  (setq python-shell-interpreter (concat pyvenv-virtual-env "Scripts/ipython.exe")
-	python-shell-interpreter-args "-i --simple-prompt"))
-
-(defun .emacs/set-python-shell-interpreter-to-python()
-  (setq python-shell-interpreter "python"
-	python-shell-interpreter-args "-i"))
-
-
-(use-package pyvenv
-  :ensure t
-  :config
-  (pyvenv-mode t)
-
-  ;; company auto completion backaend
-  ;; (add-hook 'elpy-mode-hook
-  ;; 	    (lambda ()
-  ;; 	      (set (make-local-variable 'company-backends)
-  ;; 		   '((company-dabbrev-code company-yasnippet elpy-company-backend)))))
-
-  ;; Set correct Python interpreter
-  (setq pyvenv-post-activate-hooks
-	(cond ((equal pyvenv-virtual-env-name "transformers")
-               (list '.emacs/set-python-shell-interpreter-to-jupyter))
-	      (t (list '.emacs/set-python-shell-interpreter-to-python))))
-
-  (setq pyvenv-post-deactivate-hooks
-        (list '.emacs/set-python-shell-interpreter-to-python)))
-
-;; Goto function definition kbd hook
-(defun goto-def-or-rgrep ()
-  "Go to definition of thing at point or do an rgrep in project if that fails"
-  (interactive)
-  (condition-case nil (elpy-goto-definition)
-    (error (elpy-rgrep-symbol (thing-at-point 'symbol)))))
-(define-key elpy-mode-map (kbd "M-.") 'goto-def-or-rgrep)
-
-;; Enable autopep8
-(require 'py-autopep8)
-(add-hook 'elpy-mode-hook 'py-autopep8-mode)
-
-
-;; Cython-mode
-(require 'cython-mode)
-(when (require 'flycheck-cython nil t)
-  (add-hook 'cython-mode-hook 'flycheck-mode))
-
-;; Basic-mode setup
 (autoload 'basic-generic-mode "basic-mode" "Major mode for editing BASIC code." t)
 (add-to-list 'auto-mode-alist '("\\.bas\\'" . basic-generic-mode))
-
 
 ;; ======================== org-mode ===================
 
@@ -482,7 +398,6 @@
 	    (push '("urgent" . "☭" ) prettify-symbols-alist)  ;; replace tag with glyph symbol
             (prettify-symbols-mode)))
 
-
 ;; =====================================================
 
 ;; Hide/Show
@@ -497,18 +412,122 @@
                nil))
 (global-set-key (kbd "C-c h") 'hs-toggle-hiding)
 
-;; C/C++
-(setq c-default-style "linux")
-(setq-default c-basic-offset 4)
+;; ;; ======================  lsp mode and stuff ============================
+;; ;; sample `helm' configuration use https://github.com/emacs-helm/helm/ for details
+;; (helm-mode)
+;; (require 'helm-xref)
+;; (define-key global-map [remap find-file] #'helm-find-files)
+;; (define-key global-map [remap execute-extended-command] #'helm-M-x)
+;; (define-key global-map [remap switch-to-buffer] #'helm-mini)
 
-(add-hook 'c-mode-common-hook 'hs-minor-mode)
-(add-hook 'emacs-lisp-mode-hook 'hs-minor-mode)
+;; (add-hook 'c-mode-hook 'lsp)
+;; (add-hook 'c++-mode-hook 'lsp)
 
-;; (add-hook 'c++-mode-hook (lambda ()
-;; 			   (modify-syntax-entry ?_ "w" c++-mode-hook)))
+;; (setq gc-cons-threshold (* 100 1024 1024)
+;;       read-process-output-max (* 1024 1024)
+;;       treemacs-space-between-root-nodes nil
+;;       company-idle-delay 0.0
+;;       company-minimum-prefix-length 1
+;;       lsp-idle-delay 0.1)  ;; clangd is fast
 
-;; set  F5 key to run compile!
-(global-set-key [f5] 'compile)
+;; (with-eval-after-load 'lsp-mode
+;;   (add-hook 'lsp-mode-hook #'lsp-enable-which-key-integration)
+;;   (require 'dap-cpptools)
+;;   (yas-global-mode))
+
+;; (setq lsp-keymap-prefix "s-n") ;; s-l used to locscreen in windows so rebind it to s-n
+
+;; ;; ====================== cmake stuff ========================
+
+;; (defun maybe-cmake-project-mode ()
+;;   (if (or (file-exists-p "CMakeLists.txt")
+;;           (file-exists-p (expand-file-name "CMakeLists.txt" (car (project-roots (project-current))))))
+;;       (cmake-project-mode)))
+
+;; (add-hook 'c-mode-hook 'maybe-cmake-project-mode)
+;; (add-hook 'c++-mode-hook 'maybe-cmake-project-mode)
+
+;; (add-hook 'find-file-hook (lambda ()
+;; 			    (when (string= (buffer-file-name) "CMakeLists.txt")
+;; 			      (cmake-mode))))
+
+;; ;; ================== python development setup ===================
+
+;; ;; Enable elpy
+;; (elpy-enable)
+;; ;;(use-package elpy
+;; ;;  :init (advice-add 'python-mode :before 'elpy-enable)
+;; ;;  :hook (elpy-mode . (lambda () (add-hook 'before-save-hook 'elpy-format-code)))
+;; ;;  :config (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
+;; ;;		)
+
+;; ;; ein custoize group properties
+;; (setq ein:output-area-inlined-images t)
+
+;; ;; Enable Flycheck
+;; (when (require 'flycheck nil t)
+;;   (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
+;;   (add-hook 'elpy-mode-hook 'flycheck-mode))
+
+;; ;;(with-current-buffer (get-buffer " *Echo Area 0*")  ; the leading space character is correct
+;; ;;     (setq-local face-remapping-alist '((default (:height 0.9) variable-pitch)))) ; etc.
+
+;; (setq python-shell-interpreter "python"
+;;       python-shell-interpreter-args "-i")
+
+;; (add-to-list 'python-shell-completion-native-disabled-interpreters
+;;              "jupyter")
+
+;; (defun .emacs/set-python-shell-interpreter-to-jupyter()
+;;   (setq python-shell-interpreter "Scripts/jupyter.exe"
+;; 	python-shell-interpreter-args "console --simple-prompt"
+;; 	python-shell-prompt-detect-failure-warning-warning nil))
+
+;; (defun .emacs/set-python-shell-interpreter-to-ipython()
+;;   (setq python-shell-interpreter (concat pyvenv-virtual-env "Scripts/ipython.exe")
+;; 	python-shell-interpreter-args "-i --simple-prompt"))
+
+;; (defun .emacs/set-python-shell-interpreter-to-python()
+;;   (setq python-shell-interpreter "python"
+;; 	python-shell-interpreter-args "-i"))
+
+;; (use-package pyvenv
+;;   :ensure t
+;;   :config
+;;   (pyvenv-mode t)
+
+;;   ;; company auto completion backaend
+;;   ;; (add-hook 'elpy-mode-hook
+;;   ;; 	    (lambda ()
+;;   ;; 	      (set (make-local-variable 'company-backends)
+;;   ;; 		   '((company-dabbrev-code company-yasnippet elpy-company-backend)))))
+
+;;   ;; Set correct Python interpreter
+;;   (setq pyvenv-post-activate-hooks
+;; 	(cond ((equal pyvenv-virtual-env-name "transformers")
+;;                (list '.emacs/set-python-shell-interpreter-to-jupyter))
+;; 	      (t (list '.emacs/set-python-shell-interpreter-to-python))))
+
+;;   (setq pyvenv-post-deactivate-hooks
+;;         (list '.emacs/set-python-shell-interpreter-to-python)))
+
+;; ;; Goto function definition kbd hook
+;; (defun goto-def-or-rgrep ()
+;;   "Go to definition of thing at point or do an rgrep in project if that fails"
+;;   (interactive)
+;;   (condition-case nil (elpy-goto-definition)
+;;     (error (elpy-rgrep-symbol (thing-at-point 'symbol)))))
+;; (define-key elpy-mode-map (kbd "M-.") 'goto-def-or-rgrep)
+
+;; ;; Enable autopep8
+;; (require 'py-autopep8)
+;; (add-hook 'elpy-mode-hook 'py-autopep8-mode)
+
+
+;; ;; Cython-mode
+;; (require 'cython-mode)
+;; (when (require 'flycheck-cython nil t)
+;;   (add-hook 'cython-mode-hook 'flycheck-mode))
 
 ;; ========================= Start server. ===============================
 (require 'server)
