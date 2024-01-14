@@ -121,6 +121,7 @@
 ;; (global-linum-mode t)            ;; Enable line numbers globaly
 (add-hook 'prog-mode-hook #'display-line-numbers-mode) ;; enable line numbers only in code buffers
 (setq linum-offset t)
+(set-default 'truncate-lines t)
 (desktop-save-mode 1)               ;; save desktop on exit mode is ON
 (put 'upcase-region 'disabled nil)
 (scroll-bar-mode -1)                ;; Hide scrollbars
@@ -397,6 +398,18 @@
             ;; (push '("[-]" . "◫" ) prettify-symbols-alist)
 	    (push '("urgent" . "☭" ) prettify-symbols-alist)  ;; replace tag with glyph symbol
             (prettify-symbols-mode)))
+
+;; custom image-url org-mode link type for remote image urls
+(org-add-link-type
+ "image-url"
+ (lambda (path)
+   (let ((img (expand-file-name
+               (concat "org-mode-image-url-temp" "." (file-name-extension path))
+               temporary-file-directory)))
+     (if (file-exists-p img)
+	 (find-file img)
+       (url-copy-file path img)
+       (find-file img)))))
 
 ;; =====================================================
 

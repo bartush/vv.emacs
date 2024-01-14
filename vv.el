@@ -23,6 +23,11 @@
        (unless (< time-est ,limit)
 	 (message "%.06f" time-est)))))
 
+(defmacro vv/defclosure (vars &rest defuns)
+  (declare (indent 1) (debug t))
+  `(let* ,vars
+	,(cons 'progn defuns)))
+
 
 (defun vv/what? (thing)
   "Prints type and object representation"
@@ -253,3 +258,44 @@
 	    (let (file-name)
 	      (setq file-name (vv/generate-available-file-name .emacs/image-export-path "img" 6 ".png"))
 	      (write-file file-name))))))))
+
+
+
+(defun vv/org-mode-image-url-toggle-overlays ()
+  "Toggle image overlays on `image-url' link types
+   `image-url' type must be registered using `org-add-link-type' function"
+  (interactive)
+  (dolist (image-url (org-element-map (org-element-parse-buffer) 'link
+		       (lambda (link)
+			 (when (string= "image-url" (org-element-property :type link))
+			   link))))
+    (let* ((link (org-element-property :path image-url))
+	   (link (or link "http://cat-bounce.com/cb.png"))
+	   (ovs (overlays-at (org-element-property :begin image-url)))
+           (ov (if ovs nil (make-overlay (org-element-property :begin image-url)
+					 (org-element-property :end image-url))))
+	   (img (if ov (create-image
+			(with-current-buffer ;;get image data from url and put it to temp buffer
+			    (url-retrieve-synchronously link)
+			  (goto-char (point-min))
+			  (re-search-forward "\r?\n\r?\n")
+			  (buffer-substring-no-properties (point) (point-max)))
+			nil t :scale 0.5)
+		  nil)))
+      (if img (progn
+		(overlay-put ov 'display img)
+		(overlay-put ov 'face 'default)
+		(overlay-put ov 'image-url t))
+	(progn (dolist (curr-ov ovs) (delete-overlay curr-ov)))))))
+
+(defun vv/insert-url-image (&optional link)
+  (interactive)
+  (let* ((link (or link "http://cat-bounce.com/cb.png"))
+	 (buf (url-retrieve-synchronously link))
+	 (point-curr (point))
+	 (image-data
+	  (with-current-buffer buf
+	    (goto-char (point-min))
+	    (re-search-forward "\r?\n\r?\n")
+	    (buffer-substring-no-properties (point) (point-max)))))
+    (put-text-property point-curr (1+ point-curr) 'display (create-image image-data nil t))))
