@@ -1,4 +1,5 @@
 (load "vv.el") ;; load helpers
+;;(load "~/.emacs.d/dape/dape.el")
 
 ;; set warning level
 (setq warning-minimum-level :error)
@@ -35,8 +36,8 @@
 
 ;; Adds the Melpa archive to the list of available repositories
 
-;; (add-to-list 'package-archives
-;;              '("melpa" . "http://melpa.org/packages/") t)
+(add-to-list 'package-archives
+             '("melpa" . "http://melpa.org/packages/") t)
 (add-to-list 'package-archives
              '("melpa-stable" . "http://stable.melpa.org/packages/") t)
 (add-to-list 'package-archives
@@ -65,38 +66,33 @@
     basic-mode
     org-download
     org-bullets
-    tree-sitter
-    tree-sitter-langs
+    company
+    python
+    jupyter
+;;    ein
     ))
 
 ;; packages not tested on 29 version, but working on 28
 (vv/when-version< "29.1"
   (let ((my-packages28 '(
-			 better-defaults ;; Set up some better Emacs defaults
-			 py-autopep8	 ;; Run autopep8 on save
-			 blacken	 ;; Black formatting on save
-			 pc-bufsw
-			 flycheck
-			 elpy
-			 undo-fu
-			 markdown-mode
-			 yasnippet
-			 lsp-mode
-			 lsp-treemacs
-			 helm-lsp
-			 projectile
-			 hydra
-			 company
-			 avy
-			 helm-xref
-			 dap-mode
-			 cython-mode
-			 flycheck-cython
-			 cmake-mode
-			 cmake-project
-			 python
-			 jupyter
-			 ein
+			 ;; better-defaults ;; Set up some better Emacs defaults
+			 ;; py-autopep8	 ;; Run autopep8 on save
+			 ;; blacken	 ;; Black formatting on save
+			 ;; pc-bufsw
+			 ;; flycheck
+			 ;; undo-fu
+			 ;; markdown-mode
+			 ;; yasnippet
+			 ;; helm-lsp
+			 ;; projectile
+			 ;; hydra
+			 ;; avy
+			 ;; helm-xref
+			 ;; dap-mode
+			 ;; cython-mode
+			 ;; flycheck-cython
+			 ;; cmake-mode
+			 ;; cmake-project
 			 )))
 
     (setq my-packages (append my-packages my-packages28))))
@@ -313,6 +309,7 @@
 (add-hook 'c-mode-hook (lambda () (auto-complete-mode -1)))   ;; disable auto-complete
 (add-hook 'c++-mode-hook (lambda () (auto-complete-mode -1))) ;; in c/c++ modes
 (add-hook 'python-mode-hook (lambda () (auto-complete-mode -1))) ;; and python mode too
+(add-hook 'python-ts-mode-hook (lambda () (auto-complete-mode -1))) ;; and python mode too
 (add-hook 'cython-mode-hook (lambda () (auto-complete-mode -1))) ;; cython mode as well
 
 ;; Which key mode - display available keybindings in popup
@@ -464,65 +461,48 @@
 ;; 			    (when (string= (buffer-file-name) "CMakeLists.txt")
 ;; 			      (cmake-mode))))
 
-;; ;; ================== python development setup ===================
+;; ================== python development setup ===================
+(use-package python-mode
+  :hook ((python-mode . eglot-ensure)
+	 (python-mode . company-mode))
+  :bind (:map python-mode-map
+	      ("<f5>" . recompile)
+	      ("<f6>" . eglot-format))
+  :mode (("\\.py\\'" . python-mode)))
 
-;; ;; Enable elpy
-;; (elpy-enable)
-;; ;;(use-package elpy
-;; ;;  :init (advice-add 'python-mode :before 'elpy-enable)
-;; ;;  :hook (elpy-mode . (lambda () (add-hook 'before-save-hook 'elpy-format-code)))
-;; ;;  :config (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
-;; ;;		)
+(use-package pyvenv
+  :ensure t
+  :config
+  (pyvenv-mode t)
+  (defun .emacs/set-python-shell-interpreter-to-jupyter()
+    (setq python-shell-interpreter "Scripts/jupyter.exe"
+	  python-shell-interpreter-args "console --simple-prompt"
+	  python-shell-prompt-detect-failure-warning-warning nil))
 
-;; ;; ein custoize group properties
-;; (setq ein:output-area-inlined-images t)
+  (defun .emacs/set-python-shell-interpreter-to-ipython()
+    (setq python-shell-interpreter (concat pyvenv-virtual-env "Scripts/ipython.exe")
+	  python-shell-interpreter-args "-i --simple-prompt"))
 
-;; ;; Enable Flycheck
-;; (when (require 'flycheck nil t)
-;;   (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
-;;   (add-hook 'elpy-mode-hook 'flycheck-mode))
+  (defun .emacs/set-python-shell-interpreter-to-python()
+    (setq python-shell-interpreter "python"
+	  python-shell-interpreter-args "-i"))
 
-;; ;;(with-current-buffer (get-buffer " *Echo Area 0*")  ; the leading space character is correct
-;; ;;     (setq-local face-remapping-alist '((default (:height 0.9) variable-pitch)))) ; etc.
+  ;; Set correct Python interpreter
+  (setq pyvenv-post-activate-hooks
+	(cond ((equal pyvenv-virtual-env-name "diffusers")
+               (list '.emacs/set-python-shell-interpreter-to-jupyter))
+	      (t (list '.emacs/set-python-shell-interpreter-to-python))))
 
-;; (setq python-shell-interpreter "python"
-;;       python-shell-interpreter-args "-i")
+  (setq pyvenv-post-deactivate-hooks
+        (list '.emacs/set-python-shell-interpreter-to-python))
+  ;; activate default environmen in this case `diffusers'
+  (pyvenv-activate "~/.virtualenvs/diffusers/"))
 
 ;; (add-to-list 'python-shell-completion-native-disabled-interpreters
 ;;              "jupyter")
 
-;; (defun .emacs/set-python-shell-interpreter-to-jupyter()
-;;   (setq python-shell-interpreter "Scripts/jupyter.exe"
-;; 	python-shell-interpreter-args "console --simple-prompt"
-;; 	python-shell-prompt-detect-failure-warning-warning nil))
-
-;; (defun .emacs/set-python-shell-interpreter-to-ipython()
-;;   (setq python-shell-interpreter (concat pyvenv-virtual-env "Scripts/ipython.exe")
-;; 	python-shell-interpreter-args "-i --simple-prompt"))
-
-;; (defun .emacs/set-python-shell-interpreter-to-python()
-;;   (setq python-shell-interpreter "python"
-;; 	python-shell-interpreter-args "-i"))
-
-;; (use-package pyvenv
-;;   :ensure t
-;;   :config
-;;   (pyvenv-mode t)
-
-;;   ;; company auto completion backaend
-;;   ;; (add-hook 'elpy-mode-hook
-;;   ;; 	    (lambda ()
-;;   ;; 	      (set (make-local-variable 'company-backends)
-;;   ;; 		   '((company-dabbrev-code company-yasnippet elpy-company-backend)))))
-
-;;   ;; Set correct Python interpreter
-;;   (setq pyvenv-post-activate-hooks
-;; 	(cond ((equal pyvenv-virtual-env-name "transformers")
-;;                (list '.emacs/set-python-shell-interpreter-to-jupyter))
-;; 	      (t (list '.emacs/set-python-shell-interpreter-to-python))))
-
-;;   (setq pyvenv-post-deactivate-hooks
-;;         (list '.emacs/set-python-shell-interpreter-to-python)))
+;; ein custoize group properties
+(setq ein:output-area-inlined-images t)
 
 ;; ;; Goto function definition kbd hook
 ;; (defun goto-def-or-rgrep ()
@@ -532,15 +512,45 @@
 ;;     (error (elpy-rgrep-symbol (thing-at-point 'symbol)))))
 ;; (define-key elpy-mode-map (kbd "M-.") 'goto-def-or-rgrep)
 
-;; ;; Enable autopep8
-;; (require 'py-autopep8)
-;; (add-hook 'elpy-mode-hook 'py-autopep8-mode)
+;; ================== Eglot & Python ==========================
+(use-package company
+  :ensure t
+  ;; :bind (:map company-mode-map
+  ;; 	      ("<tab>" . company-complete))
+  :config
+  (setq company-idle-delay 0.1
+	company-minimum-prefix-length 1)
+  ;;(global-set-key (kbd "<C-return>") 'company-complete)
+  ;;(global-company-mode 1)
+  )
 
+(use-package eglot
+  :ensure t
+  :defer t
+  :hook (python-mode . eglot-ensure)
+  :bind (:map eglot-mode-map
+	      ("C-c d" . eldoc)
+	      ("C-c a" . eglot-code-actions)
+	      ("C-c r" . eglot-rename))
+  ;;   (("<f7>" . dape-step-in)
+  ;;    ("<f8>" . dape-next)
+  ;;    ("<f9>" . dape-continue))
+  )
+;; (add-hook 'eglot-managed-mode-hook (lambda ()
+;; 				     (remove-hook 'flymake-diagnostic-functions 'eglot-flymake-backend)
+;; 				     (flymake-eslint-enable)))
 
-;; ;; Cython-mode
-;; (require 'cython-mode)
-;; (when (require 'flycheck-cython nil t)
-;;   (add-hook 'cython-mode-hook 'flycheck-mode))
+;; (use-package dape
+;;   :config
+;;   (add-to-list 'dape-configs
+;;                `(debugpy
+;;                  modes (python-ts-mode python-mode)
+;;                  command "python3"
+;;                  command-args ("-m" "debugpy.adapter")
+;;                  :type "executable"
+;;                  :request "launch"
+;;                  :cwd dape-cwd-fn
+;;                  :program dape-find-file-buffer-default)))
 
 ;; ========================= Start server. ===============================
 (require 'server)
