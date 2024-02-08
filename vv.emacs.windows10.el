@@ -140,6 +140,7 @@
 (setq w32-lwindow-modifier 'super) ; Left Windows key
 (setq w32-pass-rwindow-to-system nil)
 (setq w32-rwindow-modifier 'super) ; Right Windows key
+(setq w32-apps-modifier 'control) ; Menu key as Ctrl
 
 (defun .emacs/display-formfeed-as-line-hook ()
   "Adds hook for displaying formfeed ^L chars as line when opening .el files"
@@ -306,14 +307,25 @@
 (ac-config-default) ;; default auto-complete config
 (setq tab-always-indent 'complete) ;; autocompletion visible in minibuffer
 (add-to-list 'completion-styles 'initials t)
-(add-hook 'c-mode-hook (lambda () (auto-complete-mode -1)))   ;; disable auto-complete
-(add-hook 'c++-mode-hook (lambda () (auto-complete-mode -1))) ;; in c/c++ modes
-(add-hook 'python-mode-hook (lambda () (auto-complete-mode -1))) ;; and python mode too
-(add-hook 'python-ts-mode-hook (lambda () (auto-complete-mode -1))) ;; and python mode too
-(add-hook 'cython-mode-hook (lambda () (auto-complete-mode -1))) ;; cython mode as well
+(add-hook 'c-mode-hook (lambda () (auto-complete-mode -1)))           ;; disable auto-complete
+(add-hook 'c++-mode-hook (lambda () (auto-complete-mode -1)))         ;; in c/c++ modes
+(add-hook 'python-mode-hook (lambda () (auto-complete-mode -1)))      ;; and python mode too
 
 ;; Which key mode - display available keybindings in popup
 (which-key-mode)
+
+;; Company mode
+(use-package company
+  :ensure t
+  ;; :bind (:map company-mode-map
+  ;; 	      ("<tab>" . company-complete))
+  :config
+  (setq company-idle-delay 0.1
+	company-minimum-prefix-length 1)
+  ;;(global-set-key (kbd "<C-return>") 'company-complete)
+  ;;(global-company-mode 1)
+  )
+
 
 ;; ====================== emacs lisp setup ===================
 
@@ -330,17 +342,42 @@
 
 ;; ====================== C/C++ ==============================
 
+(use-package c-mode
+  :hook ((c-mode . eglot-ensure)
+	 (c-mode . company-mode)
+	 (c++-mode . eglot-ensure)
+	 (c++-mode . company-mode))
+  :bind (:map c-mode-map
+	      ("<f5>" . recompile)
+	      ("<f6>" . eglot-format))
+  )
+
 (setq c-default-style "linux")
 (setq-default c-basic-offset 4)
 
+;; hide-show mode
 (add-hook 'c-mode-common-hook 'hs-minor-mode)
+(add-hook 'c++-mode-hook 'hs-minor-mode)
 (add-hook 'emacs-lisp-mode-hook 'hs-minor-mode)
+
+(font-lock-add-keywords 'c-mode '("\\<nil\\>"))
+
+;; ;; company mode
+;; (add-hook c-mode-common-hook 'company-mode)
+;; (add-hook c-mode-hook 'company-mode)
+;; (add-hook c++-mode-hook 'company-mode)
+
+;; ;; eglot
+;; (add-hook 'c-mode-common-hook 'eglot-ensure)
+;; (add-hook 'c-mode-hook 'eglot-ensure)
+;; (add-hook 'c++-mode-hook 'eglot-ensure)
 
 ;; (add-hook 'c++-mode-hook (lambda ()
 ;; 			   (modify-syntax-entry ?_ "w" c++-mode-hook)))
 
 ;; set  F5 key to run compile!
 (global-set-key [f5] 'compile)
+
 
 ;; ======================== Basic-mode setup ===========
 
@@ -461,6 +498,25 @@
 ;; 			    (when (string= (buffer-file-name) "CMakeLists.txt")
 ;; 			      (cmake-mode))))
 
+;; =========================== Eglot ========================
+(use-package eglot
+  :ensure t
+  :defer t
+  :hook ((python-mode . eglot-ensure)
+	 ;;(python-mode . hs-minor-mode)
+	 )
+  :bind (:map eglot-mode-map
+	      ("C-c d" . eldoc)
+	      ("C-c a" . eglot-code-actions)
+	      ("C-c r" . eglot-rename))
+  ;;   (("<f7>" . dape-step-in)
+  ;;    ("<f8>" . dape-next)
+  ;;    ("<f9>" . dape-continue))
+  )
+;; (add-hook 'eglot-managed-mode-hook (lambda ()
+;; 				     (remove-hook 'flymake-diagnostic-functions 'eglot-flymake-backend)
+;; 				     (flymake-eslint-enable)))
+
 ;; ================== python development setup ===================
 (use-package python-mode
   :hook ((python-mode . eglot-ensure)
@@ -469,6 +525,9 @@
 	      ("<f5>" . recompile)
 	      ("<f6>" . eglot-format))
   :mode (("\\.py\\'" . python-mode)))
+
+(use-package python
+  :hook ((python-mode . hs-minor-mode)))
 
 (use-package pyvenv
   :ensure t
@@ -511,34 +570,6 @@
 ;;   (condition-case nil (elpy-goto-definition)
 ;;     (error (elpy-rgrep-symbol (thing-at-point 'symbol)))))
 ;; (define-key elpy-mode-map (kbd "M-.") 'goto-def-or-rgrep)
-
-;; ================== Eglot & Python ==========================
-(use-package company
-  :ensure t
-  ;; :bind (:map company-mode-map
-  ;; 	      ("<tab>" . company-complete))
-  :config
-  (setq company-idle-delay 0.1
-	company-minimum-prefix-length 1)
-  ;;(global-set-key (kbd "<C-return>") 'company-complete)
-  ;;(global-company-mode 1)
-  )
-
-(use-package eglot
-  :ensure t
-  :defer t
-  :hook (python-mode . eglot-ensure)
-  :bind (:map eglot-mode-map
-	      ("C-c d" . eldoc)
-	      ("C-c a" . eglot-code-actions)
-	      ("C-c r" . eglot-rename))
-  ;;   (("<f7>" . dape-step-in)
-  ;;    ("<f8>" . dape-next)
-  ;;    ("<f9>" . dape-continue))
-  )
-;; (add-hook 'eglot-managed-mode-hook (lambda ()
-;; 				     (remove-hook 'flymake-diagnostic-functions 'eglot-flymake-backend)
-;; 				     (flymake-eslint-enable)))
 
 ;; (use-package dape
 ;;   :config
