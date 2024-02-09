@@ -204,6 +204,8 @@
 (global-set-key (kbd "C-z") 'undo-fu-only-undo)
 (global-set-key (kbd "C-y") 'undo-fu-only-redo)
 (global-set-key (kbd "C-x f") 'find-file) ;; reset "C-x f" to find file same as "C-x C-f"
+(global-set-key (kbd "C-x r") 'read-only-mode)
+(global-set-key (kbd "C-x v") 'pyvenv-activate)
 
 ;; vv key bidings
 (global-set-key (kbd "C-c v e") 'vv/ipynb-export-image-at-point) ;; export image from notebook at point
@@ -341,6 +343,21 @@
 				   (modify-syntax-entry ?- "w" emacs-lisp-mode-syntax-table)))
 
 ;; ====================== C/C++ ==============================
+(require 'cc-mode)
+
+(defun .emacs/c-compile-debug ()
+  (interactive)
+  ;; (recompile compile-command)
+  ;;(gdb (read-string "gdb command: " (gud-val 'command-name 'gdb)))
+  (call-interactively 'gdb))
+
+(defun .emacs/after-c-compile-debug ()
+  (let ((file-windows-config "~/.emacs.d/gdb-windows.conf"))
+    (when (file-exists-p file-windows-config)
+      (gdb-load-window-configuration file-windows-config))))
+
+(advice-add '.emacs/c-compile-debug :after '.emacs/after-c-compile-debug)
+;;(add-hook 'gdb-mode-hook #'.emacs/after-c-compile-debug)
 
 (use-package c-mode
   :hook ((c-mode . eglot-ensure)
@@ -348,9 +365,9 @@
 	 (c++-mode . eglot-ensure)
 	 (c++-mode . company-mode))
   :bind (:map c-mode-map
-	      ("<f5>" . recompile)
-	      ("<f6>" . eglot-format))
-  )
+	      (("<f5>" . compile)
+	       ("C-<f5>" . .emacs/c-compile-debug)
+	       ("<f8>" . eglot-format))))
 
 (setq c-default-style "linux")
 (setq-default c-basic-offset 4)
@@ -520,7 +537,14 @@
 ;; ================== python development setup ===================
 (use-package python-mode
   :hook ((python-mode . eglot-ensure)
-	 (python-mode . company-mode))
+	 (python-mode . company-mode)
+	 (python-mode . (lambda ()
+			  (setq-local compile-command
+				      (concat "python "
+					      (when buffer-file-name
+						(
+						 ;;shell-quote-argument
+						 buffer-file-name)))))))
   :bind (:map python-mode-map
 	      ("<f5>" . recompile)
 	      ("<f6>" . eglot-format))
