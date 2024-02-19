@@ -345,18 +345,25 @@
 ;; ====================== C/C++ ==============================
 (require 'cc-mode)
 
-(defun .emacs/c-compile-debug ()
+(defun .emacs/c-recompile-debug()
   (interactive)
-  ;; (recompile compile-command)
-  ;;(gdb (read-string "gdb command: " (gud-val 'command-name 'gdb)))
-  (call-interactively 'gdb))
+  (call-interactively 'recompile))
+
+(defun .emacs/c-debug ()
+  (interactive)
+  (condition-case nil
+      (call-interactively 'gdb)
+    (error nil)))
 
 (defun .emacs/after-c-compile-debug ()
   (let ((file-windows-config "~/.emacs.d/gdb-windows.conf"))
     (when (file-exists-p file-windows-config)
-      (gdb-load-window-configuration file-windows-config))))
+      (gdb-load-window-configuration file-windows-config)
+	;;(goto-char (point-max))
+	)))
 
-(advice-add '.emacs/c-compile-debug :after '.emacs/after-c-compile-debug)
+(advice-add '.emacs/c-recompile-debug :after '.emacs/c-debug)
+(advice-add '.emacs/c-debug :after '.emacs/after-c-compile-debug)
 ;;(add-hook 'gdb-mode-hook #'.emacs/after-c-compile-debug)
 
 (use-package c-mode
@@ -366,10 +373,11 @@
 	 (c++-mode . company-mode))
   :bind (:map c-mode-map
 	      (("<f5>" . compile)
-	       ("C-<f5>" . .emacs/c-compile-debug)
+	       ("C-<f5>" . .emacs/c-recompile-debug)
 	       ("<f8>" . eglot-format))))
 
 (setq c-default-style "linux")
+;;(setq c-default-style "gnu")
 (setq-default c-basic-offset 4)
 
 ;; hide-show mode
