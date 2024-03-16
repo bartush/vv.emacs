@@ -206,6 +206,7 @@
 (global-set-key (kbd "C-x f") 'find-file) ;; reset "C-x f" to find file same as "C-x C-f"
 (global-set-key (kbd "C-x r") 'read-only-mode)
 (global-set-key (kbd "C-x v") 'pyvenv-activate)
+(global-set-key [(control tab)] 'ff-find-other-file)
 
 ;; vv key bidings
 (global-set-key (kbd "C-c v e") 'vv/ipynb-export-image-at-point) ;; export image from notebook at point
