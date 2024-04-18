@@ -471,6 +471,15 @@
        (url-copy-file path img)
        (find-file img)))))
 
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((octave . t)
+   (python . t)))
+
+(defun my-org-confirm-babel-evaluate (lang body)
+  (not (or  (string= lang "octave")
+	    (string= lang "python"))))  ;don't ask for octave and python
+(setq org-confirm-babel-evaluate #'my-org-confirm-babel-evaluate)
 ;; =====================================================
 
 ;; Hide/Show
