@@ -13,6 +13,8 @@
 
 (defconst .emacs/image-export-path "~/../../../photo-export-emacs")
 
+(defconst .emacs/default-coding-system 'cp1251-dos)
+
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -219,7 +221,7 @@
 (require 'benchmark)
 
 ;; ============== Coding system stuff =====================
-(prefer-coding-system 'cp1251-dos)  ;; default coding system
+(prefer-coding-system .emacs/default-coding-system)  ;; default coding system
 ;; (setq process-coding-system-alist
 ;;       (cons '("bash" . (cp1251-dos . cp1251-dos))
 ;; 	    process-coding-system-alist)) ;; coding system for eshell on windows
@@ -480,6 +482,7 @@
   (not (or  (string= lang "octave")
 	    (string= lang "python"))))  ;don't ask for octave and python
 (setq org-confirm-babel-evaluate #'my-org-confirm-babel-evaluate)
+
 ;; =====================================================
 
 ;; Hide/Show
@@ -625,6 +628,45 @@
 ;;                  :cwd dape-cwd-fn
 ;;                  :program dape-find-file-buffer-default)))
 
+;; ========================= telega ======================================
+;;(require 'telega)
+
+;; ========================= Google Translate ============================
+(require 'facemenu)
+(require 'google-translate)
+(require 'google-translate-smooth-ui)
+(defun google-translate--search-tkk () "Search TKK." (list 430675 2721866130))
+(setq google-translate-backend-method 'curl)
+(global-set-key "\C-ct" 'google-translate-smooth-translate)
+(setq google-translate-translation-directions-alist
+      '(("en" . "ru") ("ru" . "en")))
+(setq google-translate-pop-up-buffer-set-focus nil)
+
+(defun .emacs/google-translate-coding ()
+  "Changes 'Google translate' window coding to utf-8"
+  (set-buffer-file-coding-system 'utf-8)
+  (when (and (string= (buffer-name) "*Google Translate*")
+	     (not (string-search "1utf-8" (symbol-name buffer-file-coding-system))))
+    (progn
+      (setq inhibit-read-only 1)
+      (save-restriction
+	(widen)
+	;; (encode-coding-region (point-min)
+	;; 		      (point-max)
+	;; 		      .emacs/default-coding-system)
+	;; (decode-coding-region (point-min)
+	;; 		      (point-max)
+	;; 		      'utf-8)
+	;;(set-buffer-file-coding-system 'utf-8)
+	)
+      (setq inhibit-read-only nil))
+    ))
+;;(add-hook 'buffer-list-update-hook '.emacs/google-translate-coding)
+;;(add-hook 'help-mode-hook '(lambda () (set-buffer-file-coding-system 'utf-8-dos)))
+
+;; ================ dirvish (improved dired) ============================
+;;(dirvish-override-dired-mode)
+
 ;; ========================= Start server. ===============================
 (require 'server)
 (unless (server-running-p)
@@ -632,5 +674,5 @@
 
 (message "Configuration vv.emacs.windows10.el loaded!")
 (if (daemonp)
-    (message "Loading in the daemon!")
+    (message on!)
   (message "Loading in regular Emacs!"))
