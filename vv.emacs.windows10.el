@@ -209,6 +209,7 @@
 (global-set-key (kbd "C-x r") 'read-only-mode)
 (global-set-key (kbd "C-x v") 'pyvenv-activate)
 (global-set-key [(control tab)] 'ff-find-other-file)
+(define-key lisp-interaction-mode-map (kbd "C-e") 'eval-print-last-sexp)
 
 ;; vv key bidings
 (global-set-key (kbd "C-c v e") 'vv/ipynb-export-image-at-point) ;; export image from notebook at point
