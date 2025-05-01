@@ -36,17 +36,19 @@
 ;; Enables basic packaging support
 (require 'package)
 
-;; Adds the Melpa archive to the list of available repositories
+;; Disable signature checking
+(setq package-check-signature nil)
 
+;; Initializes the package infrastructure
+(package-initialize)
+
+;; Adds the Melpa archive to the list of available repositories
 (add-to-list 'package-archives
              '("melpa" . "http://melpa.org/packages/") t)
 (add-to-list 'package-archives
              '("melpa-stable" . "http://stable.melpa.org/packages/") t)
 (add-to-list 'package-archives
              '("gnu" . "http://elpa.gnu.org/packages/") t)
-
-;; Initializes the package infrastructure
-(package-initialize)
 
 ;; If there are no archived package contents, refresh them
 (when (not package-archive-contents)
@@ -60,6 +62,7 @@
   '(
     ayu-theme       ;; Ayu theme
     use-package	    ;; Package configuration macros
+    undo-tree
     auto-complete
     paredit
     rainbow-delimiters
@@ -82,7 +85,6 @@
 			 ;; blacken	 ;; Black formatting on save
 			 ;; pc-bufsw
 			 ;; flycheck
-			 ;; undo-fu
 			 ;; markdown-mode
 			 ;; yasnippet
 			 ;; helm-lsp
@@ -129,6 +131,11 @@
 (set-face-attribute 'region nil :background "#666" :foreground "#ffffff")  ;; tweek selection (region) attributes
 (setq delete-by-moving-to-trash t)  ;; enable move to trash bin
 (put 'narrow-to-region 'disabled nil) ;; enable narrowing
+
+;; undoo-tree settings
+(global-undo-tree-mode)
+(global-set-key (kbd "C-z") 'undo)
+(global-set-key (kbd "C-y") 'undo-tree-redo)
 
 ;; disable second selection shortcuts
 (global-unset-key [M-mouse-1])
@@ -203,10 +210,7 @@
   (setq-local face-remapping-alist (.emacs/get-font-prop-list (/ 0.6 0.6))))
 
 ;; key bindings
-(global-set-key (kbd "C-z") 'undo-fu-only-undo)
-(global-set-key (kbd "C-y") 'undo-fu-only-redo)
 (global-set-key (kbd "C-x f") 'find-file) ;; reset "C-x f" to find file same as "C-x C-f"
-(global-set-key (kbd "C-x r") 'read-only-mode)
 (global-set-key (kbd "C-x v") 'pyvenv-activate)
 (global-set-key [(control tab)] 'ff-find-other-file)
 (define-key lisp-interaction-mode-map (kbd "C-e") 'eval-print-last-sexp)
