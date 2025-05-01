@@ -54,8 +54,6 @@
 (when (not package-archive-contents)
   (package-refresh-contents))
 
-;;(setq package-check-signatures nil) ;; disable signature checking
-
 ;; Installs packages
 ;; my packages list
 (defvar my-packages
@@ -74,6 +72,7 @@
     company
     python
     jupyter
+    google-translate
 ;;    ein
     ))
 
