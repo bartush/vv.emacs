@@ -10,10 +10,11 @@
 (defconst .emacs/default-face-size (cond  ((equal "COREI3" (system-name)) 190)
 					  ((equal "THINKPAD" (system-name)) 190)
 					  (t 230)))
-
 (defconst .emacs/image-export-path "~/../../../photo-export-emacs")
 
 (defconst .emacs/default-coding-system 'cp1251-dos)
+
+(defconst .emacs/default-font "basis33")
 
 
 (custom-set-variables
@@ -164,7 +165,7 @@
  scroll-preserve-screen-position 1) ;; Scrolling parameters
 
 (defvar .emacs/default-face-properties-list
-  (list :family "basis33" :foundry "outline" :antialias 'none :slant 'normal :weight 'normal :height .emacs/default-face-size :width 'normal))
+  (list :family .emacs/default-font :foundry "outline" :antialias 'none :slant 'normal :weight 'normal :height .emacs/default-face-size :width 'normal))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -172,10 +173,10 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  (list 'default (list (list t .emacs/default-face-properties-list))) ;; default face
- '(fixed-pitch ((t (:inherit default :family "basis33" :foreground "light green"))))
+ '(fixed-pitch ((t (:inherit default :family .emacs/default-font :foreground "light green"))))
  '(fixed-pitch-serif ((t (:inherit default :foreground "light blue"))))
  ;;'(variable-pitch ((default nil) (nil nil)))
- '(variable-pitch ((t (:family "basis33"))))
+ '(variable-pitch ((t (:family .emacs/default-font))))
  '(help-for-help-header ((t (:height 1.02))))
  '(helm-source-header ((t (:weight bold :height 1.05))))
  '(helm-ff-dotted-directory ((t (:background "gainsboro"))))
@@ -195,8 +196,11 @@
  '(org-level-7 ((t (:inherit outline-7 :weight bold :height 1.0))))
  '(org-level-8 ((t (:inherit outline-8 :weight bold :height 1.0)))))
 
-
-(set-fontset-font "fontset-default" 'windows-1251 "basis33") ;; set font for russian characters
+(setq use-default-font-for-symbols nil)
+(set-fontset-font "fontset-default" 'unicode .emacs/default-font nil 'prepend)
+(set-fontset-font "fontset-default" 'unicode "Courier New" nil 'append)
+(set-fontset-font "fontset-default" 'windows-1251 .emacs/default-font nil 'prepend) ;; set font for russian characters
+(set-fontset-font "fontset-default" 'emoji "Segoe UI Emoji" nil 'append) ;; Установка шрифта для эмодзи
 
 ;; echo buffer tweeks
 (defun .emacs/get-font-prop-list (size)
@@ -235,6 +239,10 @@
 (add-to-list 'file-coding-system-alist '("\\.hpp" . utf-8))
 (add-to-list 'file-coding-system-alist '("\\.c" . utf-8))
 (add-to-list 'file-coding-system-alist '("\\.h" . utf-8))
+(add-hook 'find-file-hook
+          (lambda ()
+            (when (string= (buffer-name) "*temp*")
+              (set-buffer-file-coding-system 'utf-8))))
 
 ;; IDO mode. Interactively do things.
 (ido-mode 1)
